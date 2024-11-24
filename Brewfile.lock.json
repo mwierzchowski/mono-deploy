@@ -1,0 +1,66 @@
+{
+  "entries": {
+    "brew": {
+      "azure-cli": {
+        "version": "2.67.0",
+        "bottle": {
+          "rebuild": 0,
+          "root_url": "https://ghcr.io/v2/homebrew/core",
+          "files": {
+            "arm64_sequoia": {
+              "cellar": ":any",
+              "url": "https://ghcr.io/v2/homebrew/core/azure-cli/blobs/sha256:4fea3256f26da7db282bfe0b3541ec60f7da7711b5903eb40a004c0fddc784a0",
+              "sha256": "4fea3256f26da7db282bfe0b3541ec60f7da7711b5903eb40a004c0fddc784a0"
+            },
+            "arm64_sonoma": {
+              "cellar": ":any",
+              "url": "https://ghcr.io/v2/homebrew/core/azure-cli/blobs/sha256:93180833cb256e97abd3c4e10f5fce064beeabea7d27c0c38008b106ccf243d4",
+              "sha256": "93180833cb256e97abd3c4e10f5fce064beeabea7d27c0c38008b106ccf243d4"
+            },
+            "arm64_ventura": {
+              "cellar": ":any",
+              "url": "https://ghcr.io/v2/homebrew/core/azure-cli/blobs/sha256:6af9547de138ebeff383764f9666f4f49b01f7a87323386007a0bb6b065c57b0",
+              "sha256": "6af9547de138ebeff383764f9666f4f49b01f7a87323386007a0bb6b065c57b0"
+            },
+            "sonoma": {
+              "cellar": ":any",
+              "url": "https://ghcr.io/v2/homebrew/core/azure-cli/blobs/sha256:e2fe8e3e6d048d795cc5d652ae4491fc9b4a95b057226339508611cd97ae277f",
+              "sha256": "e2fe8e3e6d048d795cc5d652ae4491fc9b4a95b057226339508611cd97ae277f"
+            },
+            "ventura": {
+              "cellar": ":any",
+              "url": "https://ghcr.io/v2/homebrew/core/azure-cli/blobs/sha256:f0a65c8609f4be30ed19f9ce82565cd67ab13925ae0bb6062bd1622643d25b37",
+              "sha256": "f0a65c8609f4be30ed19f9ce82565cd67ab13925ae0bb6062bd1622643d25b37"
+            },
+            "x86_64_linux": {
+              "cellar": ":any_skip_relocation",
+              "url": "https://ghcr.io/v2/homebrew/core/azure-cli/blobs/sha256:ff63d27dc6262753ee4406650111ce108893a0de1bc7e6a97f9e9a68f29e949f",
+              "sha256": "ff63d27dc6262753ee4406650111ce108893a0de1bc7e6a97f9e9a68f29e949f"
+            }
+          }
+        }
+      },
+      "azure-functions-core-tools@4": {
+        "version": "4.0.6610",
+        "bottle": false
+      }
+    },
+    "tap": {
+      "azure/functions": {
+        "revision": "54570f02e62598689bd28bf2257673125301de67"
+      }
+    }
+  },
+  "system": {
+    "macos": {
+      "sequoia": {
+        "HOMEBREW_VERSION": "4.4.6",
+        "HOMEBREW_PREFIX": "/opt/homebrew",
+        "Homebrew/homebrew-core": "api",
+        "CLT": "16.1.0.0.1.1729049160",
+        "Xcode": "16.0",
+        "macOS": "15.1.1"
+      }
+    }
+  }
+}

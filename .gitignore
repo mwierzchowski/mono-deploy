@@ -1,0 +1,49 @@
+### Helm
+**/charts/*.tgz
+
+### Gradle & Java
+.gradle
+build
+!**/src/main/**/build/
+!**/src/test/**/build/
+.gradletasknamecache
+.mtj.tmp/
+hs_err_pid*
+replay_pid*
+
+### IntelliJ IDEA
+out/
+src/main/generated/
+/.idea/*
+!/.idea/runConfigurations
+*.iws
+*.iml
+*.ipr
+
+### STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+
+### VS Code
+.vscode/
+
+### MacOS
+.DS_Store
+
+### Various
+*.log
+*.ctxt

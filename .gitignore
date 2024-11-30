@@ -2,8 +2,7 @@
 **/.terraform/
 **/terraform.tfstate
 **/terraform.tfstate.backup
-**/local.auto.tfvars
-**/secrets.auto.tfvars
+**/.local.auto.tfvars
 
 ### Helm
 **/charts/*.tgz

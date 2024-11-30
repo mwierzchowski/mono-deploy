@@ -1,3 +1,7 @@
+variable "subscription_id" {
+  sensitive = true
+}
+
 terraform {
   required_providers {
     azurerm = {
@@ -18,7 +22,3 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 
-resource "azurerm_resource_group" "default" {
-  name     = var.resource_group_name
-  location = var.location
-}

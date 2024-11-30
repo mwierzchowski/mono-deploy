@@ -19,6 +19,6 @@ provider "azurerm" {
 }
 
 resource "azurerm_resource_group" "default" {
-  name     = "${var.app_name}_${var.cfg_name}"
+  name     = var.resource_group_name
   location = var.location
 }

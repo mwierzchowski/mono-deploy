@@ -9,12 +9,12 @@ terraform {
       version = "~> 4.0"
     }
   }
- backend "azurerm" {
-   resource_group_name  = "mono_shared"
-   storage_account_name = "monoshared5gxr2n"
-   container_name             = "tfstate"
-   key                                  = "staging/terraform.tfstate"
- }
+  backend "azurerm" {
+    resource_group_name  = "mono_shared_resources"
+    storage_account_name = "monoshared33dv1j"
+    container_name             = "tfstate"
+    key                                  = "integration/terraform.tfstate"
+  }
 }
 
 provider "azurerm" {

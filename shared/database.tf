@@ -63,3 +63,7 @@ resource "azurerm_postgresql_flexible_server" "default" {
 output "postgresql_server_fqdn" {
   value = azurerm_postgresql_flexible_server.default.fqdn
 }
+
+output "postgresql_server_id" {
+  value = azurerm_postgresql_flexible_server.default.id
+}

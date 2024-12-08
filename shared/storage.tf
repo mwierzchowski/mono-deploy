@@ -6,14 +6,8 @@ variable "storage_replication" {
     default = "LRS"
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  special = false
-}
-
 resource "azurerm_storage_account" "default" {
-  name                                  = "${local.default_resource_simplename}${random_string.suffix.result}"
+  name                                  = local.default_resource_unique_simplename
   resource_group_name      = azurerm_resource_group.default.name
   location                              = azurerm_resource_group.default.location
   account_tier                      = var.storage_tier

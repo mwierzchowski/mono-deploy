@@ -1,0 +1,45 @@
+### Terraform
+**/.terraform/
+**/terraform.tfstate
+**/terraform.tfstate.backup
+**/.local.auto.tfvars
+
+### Helm
+**/charts/*.tgz
+
+### IntelliJ IDEA
+out/
+src/main/generated/
+/.idea/*
+!/.idea/runConfigurations
+*.iws
+*.iml
+*.ipr
+
+### STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+
+### VS Code
+.vscode/
+
+### MacOS
+.DS_Store
+
+### Various
+*.log
+*.ctxt

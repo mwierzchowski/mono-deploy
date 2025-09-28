@@ -6,21 +6,16 @@ locals {
   family      = "mono"
   env         = "primary"
   unique_name = "${local.family}${random_id.suffix.hex}"
-  tags_shared = {
-    env     = local.env
+  tags = {
     repo    = "${local.family}-deploy"
     service = "shared"
-  }
-  tags_jvm = {
-    env  = local.env
-    repo = "${local.family}-jvm"
   }
 }
 
 resource "azurerm_resource_group" "rg" {
   name     = "rg-${local.family}-${local.env}"
   location = "northeurope"
-  tags     = local.tags_shared
+  tags     = local.tags
 }
 
 resource "azurerm_storage_account" "sa" {
@@ -29,7 +24,7 @@ resource "azurerm_storage_account" "sa" {
   location                 = azurerm_resource_group.rg.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  tags                     = local.tags_shared
+  tags                     = local.tags
 }
 
 resource "azurerm_storage_container" "tfstate" {
@@ -44,7 +39,7 @@ resource "azurerm_container_registry" "acr" {
   location            = azurerm_resource_group.rg.location
   sku                 = "Basic"
   admin_enabled       = false
-  tags                = local.tags_shared
+  tags                = local.tags
 }
 
 resource "azurerm_log_analytics_workspace" "la" {
@@ -53,7 +48,7 @@ resource "azurerm_log_analytics_workspace" "la" {
   resource_group_name = azurerm_resource_group.rg.name
   sku                 = "PerGB2018"
   retention_in_days   = 30
-  tags                = local.tags_shared
+  tags                = local.tags
 }
 
 resource "azurerm_container_app_environment" "apps_env" {
@@ -61,14 +56,14 @@ resource "azurerm_container_app_environment" "apps_env" {
   location                   = azurerm_resource_group.rg.location
   resource_group_name        = azurerm_resource_group.rg.name
   log_analytics_workspace_id = azurerm_log_analytics_workspace.la.id
-  tags                       = local.tags_shared
+  tags                       = local.tags
 }
 
 resource "azurerm_user_assigned_identity" "acr_pull" {
   name                = "uami-acr-pull"
   location            = azurerm_resource_group.rg.location
   resource_group_name = azurerm_resource_group.rg.name
-  tags                = local.tags_shared
+  tags                = local.tags
 }
 
 resource "azurerm_role_assignment" "acr_pull" {

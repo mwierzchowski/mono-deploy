@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: primary
+        working-directory: ${{github.workflow}}
     env:
       ARM_USE_OIDC: "true"
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
@@ -31,8 +31,6 @@ jobs:
 
       - name: 'Set up Terraform'
         uses: hashicorp/setup-terraform@v3
-        with:
-          terraform_version: 1.9.5
 
       - name: 'Login to Azure'
         uses: azure/login@v2

@@ -1,4 +1,5 @@
 module "smerek" {
+  # TODO replace with main
   source = "git::https://github.com/mwierzchowski/mono-jvm.git//projects/smerek/deploy?ref=azf-deployment"
   resource_group_name          = azurerm_resource_group.rg.name
   container_app_environment_id = azurerm_container_app_environment.apps_env.id

@@ -10,6 +10,9 @@ locals {
     repo    = "${local.family}-deploy"
     service = "shared"
   }
+  acr_purge_dev_cmd    = "acr purge --filter '*:.*-dev\\..*' --ago 1h"
+  acr_purge_stable_cmd = "acr purge --filter '*:^\\d+$' --ago 0d --keep 10"
+  acr_purge_schedule   = "0 2 * * *"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -40,6 +43,29 @@ resource "azurerm_container_registry" "acr" {
   sku                 = "Basic"
   admin_enabled       = false
   tags                = local.tags
+}
+
+resource "azurerm_container_registry_task" "acr_purge" {
+  name                  = "task-acr-purge"
+  container_registry_id = azurerm_container_registry.acr.id
+  is_system_task        = false
+  tags                  = local.tags
+  platform {
+    os = "Linux"
+  }
+  encoded_step {
+    task_content = <<-YAML
+      version: v1.1.0
+      steps:
+        - cmd: ${local.acr_purge_dev_cmd}
+        - cmd: ${local.acr_purge_stable_cmd}
+      YAML
+  }
+  timer_trigger {
+    enabled  = true
+    name     = "scheduled"
+    schedule = local.acr_purge_schedule
+  }
 }
 
 resource "azurerm_log_analytics_workspace" "la" {

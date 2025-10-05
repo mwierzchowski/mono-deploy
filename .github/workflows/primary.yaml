@@ -42,14 +42,11 @@ jobs:
       - name: 'Configure Git auth'
         run: git config --global url."https://${{ secrets.PAT_MONO_JVM_READ }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
-      - name: 'Terraform Init'
+      - name: 'Init'
         run: terraform init -input=false
 
-      - name: 'Terraform Validate'
+      - name: 'Validate'
         run: terraform validate
 
-      - name: 'Terraform Plan'
-        run: terraform plan -out=tfplan
-
-      - name: 'Terraform Apply'
-        run: terraform apply -auto-approve tfplan
+      - name: 'Apply'
+        run: terraform apply -auto-approve -input=false

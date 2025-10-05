@@ -3,7 +3,9 @@ name: primary
 on:
   push:
 #    branches: [ main ]
-    paths: [ 'primary/**' ]
+    paths:
+      - .github/workflows/primary.yaml
+      - primary/**
   workflow_dispatch:
 
 permissions:

@@ -40,8 +40,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: 'Configure Git auth'
-        run: |
-          git config --global url."https://${{ secrets.PAT_MONO_JVM_READ }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+        run: git config --global url."https://${{ secrets.PAT_MONO_JVM_READ }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
       - name: 'Terraform Init'
         run: terraform init -input=false

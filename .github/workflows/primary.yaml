@@ -42,6 +42,33 @@ jobs:
       - name: 'Configure Git auth'
         run: git config --global url."https://${{ secrets.PAT_MONO_JVM_READ }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
+      - name: Show who I am (AAD)
+        run: |
+          echo "AZURE_CLIENT_ID=$AZURE_CLIENT_ID"
+          az account show
+          echo "---- Service principal object (AAD) ----"
+          az ad sp show --id "$AZURE_CLIENT_ID" --query "{displayName:displayName,objectId:id,appId:appId}" -o table
+
+      - name: Show Storage role assignments for this SP
+        env:
+          RG: rg-mono-primary
+          SA: mono058f3201
+        run: |
+          SA_ID=$(az storage account show -g "$RG" -n "$SA" --query id -o tsv)
+          SP_OBJ_ID=$(az ad sp show --id "$AZURE_CLIENT_ID" --query id -o tsv)
+          echo "SA_ID=$SA_ID"
+          echo "SP_OBJ_ID=$SP_OBJ_ID"
+          az role assignment list --assignee "$SP_OBJ_ID" --scope "$SA_ID" --query "[].{role:roleDefinitionName,id:id}" -o table
+
+      - name: Try data-plane list with login token
+        env:
+          SA: mono058f3201
+        run: |
+          echo "Listing containers with data-plane auth..."
+          az storage container list --account-name "$SA" --auth-mode login -o table || true
+          echo "Listing blobs in 'tfstate' (non-fatal if empty/missing)..."
+          az storage blob list --account-name "$SA" -c tfstate --auth-mode login -o table || true
+
       - name: 'Terraform Init'
         run: terraform init -input=false
 

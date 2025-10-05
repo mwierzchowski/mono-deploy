@@ -42,37 +42,37 @@ jobs:
       - name: 'Configure Git auth'
         run: git config --global url."https://${{ secrets.PAT_MONO_JVM_READ }}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 
-      - name: Who am I (service principal)
-        run: |
-          echo "ARM_CLIENT_ID=$ARM_CLIENT_ID"
-          echo "----- az account show -----"
-          az account show
-          echo "----- derive IDs -----"
-          # appId (clientId) of the signed-in SP:
-          SP_APPID=$(az account show --query 'user.name' -o tsv)
-          echo "SP_APPID=$SP_APPID"
-          # objectId in Entra ID:
-          SP_OBJID=$(az ad sp show --id "$SP_APPID" --query id -o tsv)
-          echo "SP_OBJID=$SP_OBJID"
-
-      - name: Check Storage RBAC for this SP
-        env:
-          RG: rg-mono-primary
-          SA: mono058f3201
-        run: |
-          SA_ID=$(az storage account show -g "$RG" -n "$SA" --query id -o tsv)
-          echo "SA_ID=$SA_ID"
-          SP_APPID=$(az account show --query 'user.name' -o tsv)
-          SP_OBJID=$(az ad sp show --id "$SP_APPID" --query id -o tsv)
-          echo "Listing role assignments at Storage Account scope:"
-          az role assignment list --assignee "$SP_OBJID" --scope "$SA_ID" --query "[].{role:roleDefinitionName,id:id}" -o table
-
-      - name: Try data-plane list (auth-mode=login)
-        env:
-          SA: mono058f3201
-        run: |
-          az storage container list --account-name "$SA" --auth-mode login -o table || true
-          az storage blob list --account-name "$SA" -c tfstate --auth-mode login -o table || true
+#      - name: Who am I (service principal)
+#        run: |
+#          echo "ARM_CLIENT_ID=$ARM_CLIENT_ID"
+#          echo "----- az account show -----"
+#          az account show
+#          echo "----- derive IDs -----"
+#          # appId (clientId) of the signed-in SP:
+#          SP_APPID=$(az account show --query 'user.name' -o tsv)
+#          echo "SP_APPID=$SP_APPID"
+#          # objectId in Entra ID:
+#          SP_OBJID=$(az ad sp show --id "$SP_APPID" --query id -o tsv)
+#          echo "SP_OBJID=$SP_OBJID"
+#
+#      - name: Check Storage RBAC for this SP
+#        env:
+#          RG: rg-mono-primary
+#          SA: mono058f3201
+#        run: |
+#          SA_ID=$(az storage account show -g "$RG" -n "$SA" --query id -o tsv)
+#          echo "SA_ID=$SA_ID"
+#          SP_APPID=$(az account show --query 'user.name' -o tsv)
+#          SP_OBJID=$(az ad sp show --id "$SP_APPID" --query id -o tsv)
+#          echo "Listing role assignments at Storage Account scope:"
+#          az role assignment list --assignee "$SP_OBJID" --scope "$SA_ID" --query "[].{role:roleDefinitionName,id:id}" -o table
+#
+#      - name: Try data-plane list (auth-mode=login)
+#        env:
+#          SA: mono058f3201
+#        run: |
+#          az storage container list --account-name "$SA" --auth-mode login -o table || true
+#          az storage blob list --account-name "$SA" -c tfstate --auth-mode login -o table || true
 
       - name: 'Terraform Init'
         run: terraform init -input=false
@@ -85,4 +85,3 @@ jobs:
 
       - name: 'Terraform Apply'
         run: terraform apply -auto-approve tfplan
-

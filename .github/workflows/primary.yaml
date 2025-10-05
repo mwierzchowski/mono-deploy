@@ -3,10 +3,12 @@ name: primary
 on:
   push:
 #    branches: [ main ]
-    paths:
-      - .github/workflows/primary.yaml
-      - primary/**
+    paths: [ primary/** ]
   workflow_dispatch:
+
+concurrency:
+  group: ${{github.workflow}}
+  cancel-in-progress: false
 
 permissions:
   id-token: write
@@ -49,4 +51,4 @@ jobs:
         run: terraform validate
 
       - name: 'Apply'
-        run: terraform apply -auto-approve -input=false
+        run: terraform apply -auto-approve -input=false -no-color -compact-warnings

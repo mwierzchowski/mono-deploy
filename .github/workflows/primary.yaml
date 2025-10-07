@@ -1,10 +1,10 @@
 name: primary
 
 on:
-  push:
-#    branches: [ main ]
-    paths: [ primary/** ]
   workflow_dispatch:
+#  push:
+#    branches: [ main ]
+#    paths: [ primary/** ]
 
 concurrency:
   group: ${{github.workflow}}

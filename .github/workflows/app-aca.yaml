@@ -1,0 +1,19 @@
+name: app-aca
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{github.workflow}}
+  cancel-in-progress: false
+
+permissions:
+  id-token: write
+  contents: write
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout repository'
+        uses: actions/checkout@v5

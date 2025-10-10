@@ -1,19 +1,95 @@
 name: app-aca
 
 on:
+#  workflow_call:
   workflow_dispatch:
+    inputs:
+      service:
+        description: "App key"
+        type: string
+        required: true
+      image:
+        description: "Full image ref"
+        type: string
+        required: true
+      repository:
+        description: "Logical repo namespace."
+        type: string
+        required: false
+        default: ""
+      target_ref:
+        description: "Branch in mono-deploy to edit"
+        type: string
+        required: false
+        default: "aca-workflow"
+#    secrets:
+#      MONO_DEPLOY_PUSH_TOKEN:
+#        required: true
 
 concurrency:
-  group: ${{github.workflow}}
+  group: ${{ github.workflow }}
   cancel-in-progress: false
 
 permissions:
-  id-token: write
   contents: write
 
 jobs:
   ACA:
     runs-on: ubuntu-latest
+    env:
+      FILE: primary/apps-aca.yaml
+      SERVICE: ${{ inputs.service }}
+      IMAGE: ${{ inputs.image }}
+      # Default repository to caller repo name (strip owner) if not provided
+      REPOSITORY: ${{ inputs.repository != '' && inputs.repository || github.event.repository.name }}
     steps:
-      - name: 'Checkout repository'
-        uses: actions/checkout@v5
+      - name: Checkout mono-deploy (target branch)
+        uses: actions/checkout@v4
+        with:
+          repository: mwierzchowski/mono-deploy
+          ref: ${{ inputs.target_ref }}
+#          token: ${{ secrets.MONO_DEPLOY_PUSH_TOKEN }}
+          fetch-depth: 0
+
+      - name: Ensure YAML exists
+        shell: bash
+        run: |
+          if [ ! -f "$FILE" ]; then
+            mkdir -p "$(dirname "$FILE")"
+            printf "apps: {}\n" > "$FILE"
+          fi
+
+      - name: Upsert service (repository)
+        uses: mikefarah/yq@v4
+        with:
+          cmd: yq -i '.apps."'"${{ env.SERVICE }}"'".repository = "'"${{ env.REPOSITORY }}"'"' "${{ env.FILE }}"
+
+      - name: Upsert service (image)
+        uses: mikefarah/yq@v4
+        with:
+          cmd: yq -i '.apps."'"${{ env.SERVICE }}"'".image = "'"${{ env.IMAGE }}"'"' "${{ env.FILE }}"
+
+      # Optionally print resulting YAML to logs
+      - name: Show updated YAML
+        run: cat "${{ env.FILE }}"
+
+      # Terraform validate without backend (no Azure login needed)
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Init
+        working-directory: primary
+        run: terraform init -backend=false -input=false -no-color
+
+      - name: Validate
+        working-directory: primary
+        run: terraform validate -no-color
+
+      - name: Commit and push change
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: ${{ env.FILE }}
+          message: "chore(app-aca): upsert ${{ env.SERVICE }} → image=${{ env.IMAGE }}, repo=${{ env.REPOSITORY }}"
+          author_name: github-actions[bot]
+          author_email: github-actions[bot]@users.noreply.github.com
+          push: true

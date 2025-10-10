@@ -3,7 +3,7 @@ locals {
   deploy_github_repo = "mono-deploy"
   # TODO replace branch with main
   # deploy_github_ref  = "refs/heads/main"
-  deploy_github_ref  = "refs/heads/deploy-azure"
+  deploy_github_ref  = "refs/heads/aca-workflow"
 }
 
 # App registration & SP used by mono-deploy to run Terraform applies

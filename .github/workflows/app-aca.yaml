@@ -75,3 +75,11 @@ jobs:
 
       - name: 'Show deployment link'
         run: echo "::notice ::Deployment in [progress](${{ env.DEPLOY_URL }})..."
+
+      - name: 'Show deployment link2'
+        run: |
+          {
+            echo '### Deployment in progress'
+            echo
+            echo 'Deployment in [progress](https://github.com/mwierzchowski/mono-deploy/actions/workflows/primary.yaml)'
+          } >> "$GITHUB_STEP_SUMMARY"

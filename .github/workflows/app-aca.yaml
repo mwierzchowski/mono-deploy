@@ -51,7 +51,7 @@ jobs:
         with:
           cmd: |
             yq -i '
-              .apps["${{ inputs.service }}"].repository = "${{ env.REPOSITORY }}" |
+              .apps["${{ inputs.service }}"].repository = "${{ inputs.repository }}" |
               .apps["${{ inputs.service }}"].image = "${{ inputs.image }}"
             ' "${{ env.CONFIG_FILE }}"
 

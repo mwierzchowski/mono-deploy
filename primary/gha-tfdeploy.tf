@@ -1,8 +1,7 @@
 locals {
   deploy_github_org  = "mwierzchowski"
   deploy_github_repo = "mono-deploy"
-  deploy_github_ref_main = "refs/heads/main"
-  deploy_github_ref_feature  = "refs/heads/aca-workflow"
+  tf_env_name        = "cd-tf"
 }
 
 # App registration & SP used by mono-deploy to run Terraform applies
@@ -14,29 +13,14 @@ resource "azuread_service_principal" "gha_tfdeploy" {
   client_id = azuread_application.gha_tfdeploy.client_id
 }
 
-# Federated credential for mono-deploy main branch
-resource "azuread_application_federated_identity_credential" "gha_tfdeploy_main" {
+resource "azuread_application_federated_identity_credential" "gha_tfdeploy_env" {
   application_id = azuread_application.gha_tfdeploy.id
-  display_name   = "gha-${local.deploy_github_repo}-${replace(local.deploy_github_ref_main, "/", "-")}"
+  display_name   = "gha-${local.deploy_github_repo}-environment-${local.tf_env_name}"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${local.deploy_github_org}/${local.deploy_github_repo}:ref:${local.deploy_github_ref_main}"
+  subject        = "repo:${local.deploy_github_org}/${local.deploy_github_repo}:environment:${local.tf_env_name}"
   audiences      = ["api://AzureADTokenExchange"]
   lifecycle {
     prevent_destroy = true
-    ignore_changes  = [display_name]
-  }
-}
-
-# Federated credential for mono-deploy feature branch
-resource "azuread_application_federated_identity_credential" "gha_tfdeploy_feature" {
-  application_id = azuread_application.gha_tfdeploy.id
-  display_name   = "gha-${local.deploy_github_repo}-${replace(local.deploy_github_ref_feature, "/", "-")}"
-  issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${local.deploy_github_org}/${local.deploy_github_repo}:ref:${local.deploy_github_ref_feature}"
-  audiences      = ["api://AzureADTokenExchange"]
-  lifecycle {
-    prevent_destroy = true
-    ignore_changes  = [display_name]
   }
 }
 

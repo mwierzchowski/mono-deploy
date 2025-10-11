@@ -1,25 +1,26 @@
 locals {
   build_github_org  = "mwierzchowski"
   build_github_repo = "mono-jvm"
-  # TODO: switch to main when ready
-  # build_github_ref  = "refs/heads/main"
-  build_github_ref  = "refs/heads/azf-deployment"
+  env_name          = "ci-acr"
 }
 
 resource "azuread_application" "gha_acrpush" {
-  display_name = "gha-${local.family}-${local.env}"  # keep to avoid replacement
+  display_name = "gha-${local.family}-${local.env}"
 }
 
 resource "azuread_service_principal" "gha_acrpush" {
   client_id = azuread_application.gha_acrpush.client_id
 }
 
-resource "azuread_application_federated_identity_credential" "gha_acrpush" {
+resource "azuread_application_federated_identity_credential" "gha_acrpush_env" {
   application_id = azuread_application.gha_acrpush.id
-  display_name   = "gha-${local.build_github_repo}-${replace(local.build_github_ref, "/", "-")}"
+  display_name   = "gha-${local.build_github_repo}-environment-${local.env_name}"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${local.build_github_org}/${local.build_github_repo}:ref:${local.build_github_ref}"
+  subject        = "repo:${local.build_github_org}/${local.build_github_repo}:environment:${local.env_name}"
   audiences      = ["api://AzureADTokenExchange"]
+  lifecycle {
+    prevent_destroy = true
+  }
 }
 
 resource "azurerm_role_assignment" "acrpush_sp_role" {

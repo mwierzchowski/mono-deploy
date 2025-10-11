@@ -19,9 +19,6 @@ on:
         description: 'Target branch for edit'
         type: string
         default: 'main'
-    secrets:
-      MONO_DEPLOY_PUSH_TOKEN:
-        required: true
 
 concurrency:
   group: ${{ github.workflow }}

@@ -20,10 +20,6 @@ on:
         type: string
         default: 'main'
 
-concurrency:
-  group: ${{ github.workflow }}
-  cancel-in-progress: false
-
 jobs:
   ACA:
     runs-on: ubuntu-latest
@@ -51,8 +47,7 @@ jobs:
             yq -i '
               .apps["${{ inputs.service }}"].repository = "${{ inputs.repository }}" |
               .apps["${{ inputs.service }}"].image = "${{ inputs.image }}"
-            ' "${{ env.CONFIG_FILE }}"
-            yq -i 'sort_keys(..)' "${{ env.CONFIG_FILE }}"            
+            ' "${{ env.CONFIG_FILE }}"            
 
       - name: 'Show updated YAML'
         run: cat '${{ env.CONFIG_FILE }}'
@@ -66,11 +61,17 @@ jobs:
           terraform init -backend=false -input=false -no-color
           terraform validate -no-color
 
+      - name: 'Prepare short image name'
+        id: short-image
+        run: |
+          img='${{ inputs.image }}'
+          echo "value=${img#*/}" >> "$GITHUB_OUTPUT"
+
       - name: 'Commit changes'
         uses: EndBug/add-and-commit@v9
         with:
           add: ${{ env.CONFIG_FILE }}
-          message: 'Upsert ${{ inputs.service }} configuration'
+          message: 'Deploy ${{ steps.short-image.outputs.value }}'
 
       - name: 'Show deployment link'
         run: echo "::notice ::https://github.com/${{ github.repository_owner }}/${{ env.DEPLOY_REPO }}/actions/workflows/${{ env.DEPLOY_ENV }}.yaml"

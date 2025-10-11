@@ -3,8 +3,8 @@ name: primary
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
-    paths: [ primary/** ]
+    branches: [ 'main' ]
+    paths: [ 'primary/**' ]
 
 concurrency:
   group: ${{github.workflow}}

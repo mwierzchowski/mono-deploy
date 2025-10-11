@@ -1,3 +1,9 @@
+locals {
+  acr_purge_dev_cmd    = "acr purge --filter '*:.*-dev\\..*' --ago 1h"
+  acr_purge_stable_cmd = "acr purge '*:^\\d+$' --ago 0d --keep 10"
+  acr_purge_schedule   = "0 2 * * *"
+}
+
 resource "azurerm_container_registry" "acr" {
   name                = local.unique_name
   resource_group_name = azurerm_resource_group.rg.name

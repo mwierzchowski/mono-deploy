@@ -1,13 +1,12 @@
 name: app-aca
 
 on:
-  #  workflow_call:
-  workflow_dispatch:
+  workflow_call:
     inputs:
       service:
         description: 'Service'
         type: string
-        required: true
+        default: ${{ github.workflow }}
       image:
         description: 'Image ref'
         type: string
@@ -15,15 +14,14 @@ on:
       repository:
         description: 'Repository'
         type: string
-        default: ''
+        default: ${{ github.event.repository.name }}
       target_ref:
         description: 'Target branch for edit'
         type: string
-        default: 'aca-workflow'
-#    secrets:
-#      MONO_DEPLOY_PUSH_TOKEN:
-#        required: true
-# ${{ github.event.repository.name }}
+        default: 'main'
+    secrets:
+      MONO_DEPLOY_PUSH_TOKEN:
+        required: true
 
 concurrency:
   group: ${{ github.workflow }}
@@ -36,15 +34,21 @@ jobs:
   ACA:
     runs-on: ubuntu-latest
     env:
-      CONFIG_FILE: primary/apps-aca.yaml
-      DEPLOY_URL: https://github.com/mwierzchowski/mono-deploy/actions/workflows/primary.yaml
+      DEPLOY_REPO: mono-deploy
+      DEPLOY_ENV: primary
+      CONFIG_FILE: ${{ env.DEPLOY_ENV }}/apps-aca.yaml
     steps:
+      - name: 'Sanity check inputs'
+        run: |
+          [ -n "${{ inputs.service }}" ] || { echo 'Service required'; exit 1; }
+          [ -n "${{ inputs.image }}" ]   || { echo 'Image required'; exit 1; }
+
       - name: 'Checkout deploy repository'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
-          repository: mwierzchowski/mono-deploy
+          repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO }}
           ref: ${{ inputs.target_ref }}
-          #          token: ${{ secrets.MONO_DEPLOY_PUSH_TOKEN }}
+          token: ${{ secrets.MONO_DEPLOY_PUSH_TOKEN }}
 
       - name: 'Upsert configuration'
         uses: mikefarah/yq@v4
@@ -54,6 +58,7 @@ jobs:
               .apps["${{ inputs.service }}"].repository = "${{ inputs.repository }}" |
               .apps["${{ inputs.service }}"].image = "${{ inputs.image }}"
             ' "${{ env.CONFIG_FILE }}"
+            yq -i 'sort_keys(..)' "${{ env.CONFIG_FILE }}"            
 
       - name: 'Show updated YAML'
         run: cat '${{ env.CONFIG_FILE }}'
@@ -62,7 +67,7 @@ jobs:
         uses: hashicorp/setup-terraform@v3
 
       - name: 'Validate terraform'
-        working-directory: primary
+        working-directory: ${{ env.DEPLOY_ENV }}
         run: |
           terraform init -backend=false -input=false -no-color
           terraform validate -no-color
@@ -74,12 +79,4 @@ jobs:
           message: 'Upsert ${{ inputs.service }} configuration'
 
       - name: 'Show deployment link'
-        run: echo "::notice ::Deployment in [progress](${{ env.DEPLOY_URL }})..."
-
-      - name: 'Show deployment link2'
-        run: |
-          {
-            echo '### Deployment in progress'
-            echo
-            echo 'Deployment in [progress](https://github.com/mwierzchowski/mono-deploy/actions/workflows/primary.yaml)'
-          } >> "$GITHUB_STEP_SUMMARY"
+        run: echo "::notice ::https://github.com/${{ github.repository_owner }}/${{ env.DEPLOY_REPO }}/actions/workflows/${{ env.DEPLOY_ENV }}.yaml"

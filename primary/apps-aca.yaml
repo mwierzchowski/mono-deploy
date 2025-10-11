@@ -5,9 +5,3 @@ apps:
     env:
       FEATURE_A: true
       FEATURE_B: false
-  smerek5:
-    repository: ""
-    image: mono058f3201.azurecr.io/mono-jvm/smerek:5
-  smerek6:
-    repository: mono-jvm6
-    image: mono058f3201.azurecr.io/mono-jvm/smerek:6

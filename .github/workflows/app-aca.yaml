@@ -1,27 +1,25 @@
 name: app-aca
 
 on:
-#  workflow_call:
+  #  workflow_call:
   workflow_dispatch:
     inputs:
       service:
-        description: "App key"
+        description: 'Service'
         type: string
         required: true
       image:
-        description: "Full image ref"
+        description: 'Image ref'
         type: string
         required: true
       repository:
-        description: "Logical repo namespace."
+        description: 'Repository'
         type: string
-        required: false
-        default: ""
+        default: ${{ github.event.repository.name }}
       target_ref:
-        description: "Branch in mono-deploy to edit"
+        description: 'Target branch for edit'
         type: string
-        required: false
-        default: "aca-workflow"
+        default: 'aca-workflow'
 #    secrets:
 #      MONO_DEPLOY_PUSH_TOKEN:
 #        required: true
@@ -37,59 +35,42 @@ jobs:
   ACA:
     runs-on: ubuntu-latest
     env:
-      FILE: primary/apps-aca.yaml
-      SERVICE: ${{ inputs.service }}
-      IMAGE: ${{ inputs.image }}
-      # Default repository to caller repo name (strip owner) if not provided
-      REPOSITORY: ${{ inputs.repository != '' && inputs.repository || github.event.repository.name }}
+      CONFIG_FILE: primary/apps-aca.yaml
+      DEPLOY_URL: https://github.com/mwierzchowski/mono-deploy/actions/workflows/primary.yaml
     steps:
-      - name: Checkout mono-deploy (target branch)
+      - name: 'Checkout deploy repository'
         uses: actions/checkout@v4
         with:
           repository: mwierzchowski/mono-deploy
           ref: ${{ inputs.target_ref }}
-#          token: ${{ secrets.MONO_DEPLOY_PUSH_TOKEN }}
-          fetch-depth: 0
+          #          token: ${{ secrets.MONO_DEPLOY_PUSH_TOKEN }}
 
-      - name: Ensure YAML exists
-        shell: bash
-        run: |
-          if [ ! -f "$FILE" ]; then
-            mkdir -p "$(dirname "$FILE")"
-            printf "apps: {}\n" > "$FILE"
-          fi
-
-      - name: Upsert service (repository)
+      - name: 'Upsert configuration'
         uses: mikefarah/yq@v4
         with:
-          cmd: yq -i '.apps."'"${{ env.SERVICE }}"'".repository = "'"${{ env.REPOSITORY }}"'"' "${{ env.FILE }}"
+          cmd: |
+            yq -i '
+              .apps["${{ inputs.service }}"].repository = "${{ env.REPOSITORY }}" |
+              .apps["${{ inputs.service }}"].image = "${{ inputs.image }}"
+            ' "${{ env.CONFIG_FILE }}"
 
-      - name: Upsert service (image)
-        uses: mikefarah/yq@v4
-        with:
-          cmd: yq -i '.apps."'"${{ env.SERVICE }}"'".image = "'"${{ env.IMAGE }}"'"' "${{ env.FILE }}"
+      - name: 'Show updated YAML'
+        run: cat '${{ env.CONFIG_FILE }}'
 
-      # Optionally print resulting YAML to logs
-      - name: Show updated YAML
-        run: cat "${{ env.FILE }}"
-
-      # Terraform validate without backend (no Azure login needed)
-      - name: Set up Terraform
+      - name: 'Set up Terraform'
         uses: hashicorp/setup-terraform@v3
 
-      - name: Init
+      - name: 'Validate terraform'
         working-directory: primary
-        run: terraform init -backend=false -input=false -no-color
+        run: |
+          terraform init -backend=false -input=false -no-color
+          terraform validate -no-color
 
-      - name: Validate
-        working-directory: primary
-        run: terraform validate -no-color
-
-      - name: Commit and push change
+      - name: 'Commit changes'
         uses: EndBug/add-and-commit@v9
         with:
-          add: ${{ env.FILE }}
-          message: "chore(app-aca): upsert ${{ env.SERVICE }} → image=${{ env.IMAGE }}, repo=${{ env.REPOSITORY }}"
-          author_name: github-actions[bot]
-          author_email: github-actions[bot]@users.noreply.github.com
-          push: true
+          add: ${{ env.CONFIG_FILE }}
+          message: 'Upsert ${{ inputs.service }} configuration'
+
+      - name: 'Show deployment link'
+        run: echo "::notice ::Deployment in [progress](${{ env.DEPLOY_URL }})..."

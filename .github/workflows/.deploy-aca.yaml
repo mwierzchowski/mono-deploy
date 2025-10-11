@@ -1,4 +1,4 @@
-name: app-aca
+name: .deploy-aca
 
 on:
   workflow_call:
@@ -8,7 +8,7 @@ on:
         type: string
         default: ${{ github.workflow }}
       image:
-        description: 'Image ref'
+        description: 'Image'
         type: string
         required: true
       repository:

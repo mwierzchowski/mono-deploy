@@ -24,9 +24,6 @@ concurrency:
   group: ${{ github.workflow }}
   cancel-in-progress: false
 
-permissions:
-  contents: write
-
 jobs:
   ACA:
     runs-on: ubuntu-latest

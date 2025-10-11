@@ -36,7 +36,7 @@ jobs:
     env:
       DEPLOY_REPO: mono-deploy
       DEPLOY_ENV: primary
-      CONFIG_FILE: ${{ env.DEPLOY_ENV }}/apps-aca.yaml
+      CONFIG_FILE: primary/apps-aca.yaml
     steps:
       - name: 'Sanity check inputs'
         run: |

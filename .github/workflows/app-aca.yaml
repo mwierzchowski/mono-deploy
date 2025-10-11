@@ -15,7 +15,7 @@ on:
       repository:
         description: 'Repository'
         type: string
-        default: ${{ github.event.repository.name }}
+        default: ''
       target_ref:
         description: 'Target branch for edit'
         type: string
@@ -23,6 +23,7 @@ on:
 #    secrets:
 #      MONO_DEPLOY_PUSH_TOKEN:
 #        required: true
+# ${{ github.event.repository.name }}
 
 concurrency:
   group: ${{ github.workflow }}

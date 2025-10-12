@@ -1,6 +1,6 @@
 apps:
   smerek:
-    image: mono058f3201.azurecr.io/mono-jvm/smerek:4
+    image: mono058f3201.azurecr.io/mono-jvm/smerek:5
     repository: mono-jvm
     env:
       FEATURE_A: true

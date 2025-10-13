@@ -1,7 +1,5 @@
 locals {
-  build_github_org  = "mwierzchowski"
-  build_github_repo = "mono-jvm"
-  env_name          = "ci-acr"
+  acr_env_name = "ci-acr"
 }
 
 resource "azuread_application" "gha_acrpush" {
@@ -14,9 +12,9 @@ resource "azuread_service_principal" "gha_acrpush" {
 
 resource "azuread_application_federated_identity_credential" "gha_acrpush_env" {
   application_id = azuread_application.gha_acrpush.id
-  display_name   = "gha-${local.build_github_repo}-environment-${local.env_name}"
+  display_name   = "gha-${local.github_build_repo}-environment-${local.acr_env_name}"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${local.build_github_org}/${local.build_github_repo}:environment:${local.env_name}"
+  subject        = "repo:${local.github_org}/${local.github_build_repo}:environment:${local.acr_env_name}"
   audiences      = ["api://AzureADTokenExchange"]
   lifecycle {
     prevent_destroy = true
@@ -35,6 +33,6 @@ output "acrpush_azure_client_id" {
   value = azuread_application.gha_acrpush.client_id
 }
 
-output "azure_tenant_id" {
+output "acrpush_azure_tenant_id" {
   value = data.azuread_client_config.current_gha_acrpush.tenant_id
 }

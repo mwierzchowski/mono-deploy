@@ -1,7 +1,5 @@
 locals {
-  deploy_github_org  = "mwierzchowski"
-  deploy_github_repo = "mono-deploy"
-  tf_env_name        = "cd-tf"
+  tf_env_name = "cd-tf"
 }
 
 # App registration & SP used by mono-deploy to run Terraform applies
@@ -15,9 +13,9 @@ resource "azuread_service_principal" "gha_tfdeploy" {
 
 resource "azuread_application_federated_identity_credential" "gha_tfdeploy_env" {
   application_id = azuread_application.gha_tfdeploy.id
-  display_name   = "gha-${local.deploy_github_repo}-environment-${local.tf_env_name}"
+  display_name   = "gha-${local.github_deploy_repo}-environment-${local.tf_env_name}"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${local.deploy_github_org}/${local.deploy_github_repo}:environment:${local.tf_env_name}"
+  subject        = "repo:${local.github_org}/${local.github_deploy_repo}:environment:${local.tf_env_name}"
   audiences      = ["api://AzureADTokenExchange"]
   lifecycle {
     prevent_destroy = true

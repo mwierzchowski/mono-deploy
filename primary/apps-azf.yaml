@@ -1,4 +1,4 @@
 apps:
   smerek:
-    package_url: https://mono058f3201.blob.core.windows.net/packages/smerek/zip/smerek-functions-12.zip
+    package_url: https://mono058f3201.blob.core.windows.net/packages/mono-jvm/smerek/13/functions.zip
     repository: mono-jvm

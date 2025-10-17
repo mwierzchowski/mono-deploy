@@ -1,0 +1,77 @@
+name: .deploy-azf
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        description: 'Service'
+        type: string
+        default: ${{ github.workflow }}
+      package:
+        description: 'Package'
+        type: string
+        required: true
+      repository:
+        description: 'Repository'
+        type: string
+        default: ${{ github.event.repository.name }}
+      target_ref:
+        description: 'Target branch for edit'
+        type: string
+        default: 'main'
+
+jobs:
+  AZF:
+    runs-on: ubuntu-latest
+    env:
+      DEPLOY_REPO: mono-deploy
+      DEPLOY_ENV: primary
+      CONFIG_FILE: primary/apps-azf.yaml
+    steps:
+      - name: 'Sanity check inputs'
+        run: |
+          [ -n "${{ inputs.service }}" ] || { echo 'Service required'; exit 1; }
+          [ -n "${{ inputs.package }}" ]   || { echo 'Package required'; exit 1; }
+
+      - name: 'Checkout deploy repository'
+        uses: actions/checkout@v5
+        with:
+          repository: ${{ github.repository_owner }}/${{ env.DEPLOY_REPO }}
+          ref: ${{ inputs.target_ref }}
+          token: ${{ secrets.MONO_DEPLOY_PUSH_TOKEN }}
+
+      - name: 'Upsert configuration'
+        uses: mikefarah/yq@v4
+        with:
+          cmd: |
+            yq -i '
+              .apps["${{ inputs.service }}"].repository = "${{ inputs.repository }}" |
+              .apps["${{ inputs.service }}"].package_url = "${{ inputs.package }}"
+            ' "${{ env.CONFIG_FILE }}"            
+
+      - name: 'Show updated YAML'
+        run: cat '${{ env.CONFIG_FILE }}'
+
+      - name: 'Set up Terraform'
+        uses: hashicorp/setup-terraform@v3
+
+      - name: 'Validate terraform'
+        working-directory: ${{ env.DEPLOY_ENV }}
+        run: |
+          terraform init -backend=false -input=false -no-color
+          terraform validate -no-color
+
+      - name: 'Prepare short package name'
+        id: short-package
+        run: |
+          pkg='${{ inputs.package }}'
+          echo "value=${pkg##*/}" >> "$GITHUB_OUTPUT"
+
+      - name: 'Commit changes'
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: ${{ env.CONFIG_FILE }}
+          message: 'Deploy ${{ steps.short-package.outputs.value }}'
+
+      - name: 'Show deployment link'
+        run: echo "::notice ::https://github.com/${{ github.repository_owner }}/${{ env.DEPLOY_REPO }}/actions/workflows/${{ env.DEPLOY_ENV }}.yaml"

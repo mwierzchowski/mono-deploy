@@ -2,9 +2,8 @@ locals {
   family      = "mono"
   group       = "shared"
   location    = "northeurope"
-  github_repo = "mono-deploy"
   tags = {
-    repo    = local.github_repo
+    repo    = "mono-deploy"
     service = local.group
   }
 }

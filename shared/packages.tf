@@ -1,7 +1,7 @@
 resource "azurerm_storage_account" "packages" {
-  name                            = "st${local.family}packages${random_id.suffix.hex}"
+  name                            = "st${local.family}${local.group}packages${random_id.suffix.hex}"
   resource_group_name             = azurerm_resource_group.shared.name
-  location                        = local.location
+  location                        = azurerm_resource_group.shared.location
   account_tier                    = "Standard"
   account_replication_type        = "LRS"
   min_tls_version                 = "TLS1_2"

@@ -25,6 +25,7 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       TF_IN_AUTOMATION: 'true'
+    environment: cd-tf
     steps:
       - name: 'Checkout repository'
         uses: actions/checkout@v5

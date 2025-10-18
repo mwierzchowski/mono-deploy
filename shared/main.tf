@@ -9,15 +9,11 @@ locals {
   }
 }
 
-resource "random_string" "suffix" {
-  length  = 6
-  upper   = false
-  lower   = true
-  numeric = true
-  special = false
+resource "random_id" "suffix" {
+  byte_length = 4
 }
 
-resource "azurerm_resource_group" "tfstate" {
+resource "azurerm_resource_group" "shared" {
   name     = "rg-${local.family}-${local.group}"
   location = local.location
   tags     = local.tags

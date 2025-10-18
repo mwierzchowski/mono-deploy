@@ -1,5 +1,5 @@
 resource "azuread_application" "gha_tf" {
-  display_name = "gha-terraform-${local.family}"
+  display_name = "gha-${local.family}-${local.github_env}"
 }
 
 resource "azuread_service_principal" "gha_tf" {
@@ -8,7 +8,7 @@ resource "azuread_service_principal" "gha_tf" {
 
 resource "azuread_application_federated_identity_credential" "gha_env_cd_tf" {
   application_id = azuread_application.gha_tf.id
-  display_name   = "repo-environment-cd-tf"
+  display_name   = "env-${local.github_env}"
   issuer         = "https://token.actions.githubusercontent.com"
   subject        = "repo:${local.github_org}/${local.github_repo}:environment:${local.github_env}"
   audiences      = ["api://AzureADTokenExchange"]
@@ -36,6 +36,6 @@ output "mono_deploy_github_secrets" {
   }
 }
 
-output "github_environment" {
+output "github_cd_environment" {
   value = local.github_env
 }

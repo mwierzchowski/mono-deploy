@@ -21,13 +21,13 @@ resource "azurerm_storage_account" "tfstate" {
 }
 
 resource "azurerm_storage_container" "tfstate" {
-  name                  = "tfstate"
+  name                  = local.res_name
   storage_account_id    = azurerm_storage_account.tfstate.id
   container_access_type = "private"
 }
 
 resource "azurerm_management_lock" "tfstate_lock" {
-  name       = "lock-tfstate"
+  name       = "lock-${local.res_name}"
   scope      = azurerm_resource_group.tfstate.id
   lock_level = "CanNotDelete"
   notes      = "Protect Terraform state resources."

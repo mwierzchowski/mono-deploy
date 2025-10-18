@@ -6,11 +6,11 @@ resource "azuread_service_principal" "gha_tf" {
   client_id = azuread_application.gha_tf.client_id
 }
 
-resource "azuread_application_federated_identity_credential" "gha_heads" {
+resource "azuread_application_federated_identity_credential" "gha_env_cd_tf" {
   application_id = azuread_application.gha_tf.id
-  display_name   = "repo-heads"
+  display_name   = "repo-environment-cd-tf"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${local.github_org}/${local.github_repo}:ref:refs/heads/*"
+  subject        = "repo:${local.github_org}/${local.github_repo}:environment:${local.github_env}"
   audiences      = ["api://AzureADTokenExchange"]
 }
 
@@ -34,4 +34,8 @@ output "mono_deploy_github_secrets" {
     AZURE_TENANT_ID       = data.azurerm_subscription.current.tenant_id
     AZURE_SUBSCRIPTION_ID = data.azurerm_subscription.current.subscription_id
   }
+}
+
+output "github_environment" {
+  value = local.github_env
 }

@@ -1,4 +1,4 @@
-# Bootstrap
+# tfstate
 This directory contains a one-time Terraform configuration used to create the Azure resources required to store all
 Terraform state files for the project.
 
@@ -16,7 +16,6 @@ az account show
 
 ## How to run
 ```bash
-cd bootstrap
 terraform init
 terraform apply
 ```

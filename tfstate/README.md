@@ -1,6 +1,6 @@
 # tfstate
 This directory contains a one-time Terraform configuration used to create the Azure resources required to store all
-Terraform state files for the project.
+Terraform state files for the project and run GHA workflows.
 
 ## Prerequisites
 1. You must have Azure CLI and Terraform installed. Use tools like Brew.
@@ -20,15 +20,8 @@ terraform init
 terraform apply
 ```
 
-Terraform will create the resource group and storage account, then print outputs with the backend configuration details:
-```terraform
-tf_backend = {
-    resource_group_name  = “rg-mono-tfstate”
-    storage_account_name = “stmonotf”
-    container_name       = “tfstate”
-}
-```
-Use these values to configure the backend in all other Terraform roots.
+Terraform will create the resource group and storage account, then print outputs with the backend configuration details.
+Use these values to configure the backend in all other Terraform modules and workflows.
 
 ## Cleanup
 Do not destroy these resources unless you intend to reset all Terraform states.

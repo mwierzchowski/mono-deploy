@@ -1,5 +1,5 @@
 resource "azurerm_storage_account" "packages" {
-  name                            = "st${local.family}${local.group}packages${random_id.suffix.hex}"
+  name                            = "st${local.family}${local.group}${random_id.suffix.hex}"
   resource_group_name             = azurerm_resource_group.shared.name
   location                        = azurerm_resource_group.shared.location
   account_tier                    = "Standard"

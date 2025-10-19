@@ -41,8 +41,7 @@ resource "azurerm_user_assigned_identity" "azf" {
 # Allow reading the ZIPs from the packages container
 resource "azurerm_role_assignment" "azf_pkg_reader" {
   for_each             = local.azf_apps
-  # scope                = data.azurerm_storage_container.packages.id
-  scope                = data.azurerm_storage_container.packages.resource_manager_id
+  scope                = data.azurerm_storage_container.packages.id
   role_definition_name = "Storage Blob Data Reader"
   principal_id         = azurerm_user_assigned_identity.azf[each.key].principal_id
 }

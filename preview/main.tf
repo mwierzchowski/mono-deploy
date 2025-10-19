@@ -8,15 +8,15 @@ locals {
   }
 }
 
-# resource "random_id" "suffix" {
-#   byte_length = 4
-# }
-
 resource "azurerm_resource_group" "preview" {
   name     = "rg-${local.family}-${local.group}"
   location = local.location
   tags     = local.tags
 }
+
+# resource "random_id" "suffix" {
+#   byte_length = 4
+# }
 
 # resource "azurerm_storage_account" "devops" {
 #  name                            = "st${local.family}${local.group}${random_id.suffix.hex}"

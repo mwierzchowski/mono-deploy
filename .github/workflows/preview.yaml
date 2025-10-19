@@ -16,31 +16,24 @@ permissions:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ${{github.workflow}}
+    environment: cd-terraform
     env:
       ARM_USE_OIDC: 'true'
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       TF_IN_AUTOMATION: 'true'
-    environment: cd-terraform
+    defaults:
+      run:
+        working-directory: ${{github.workflow}}
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v5
 
-      - name: 'Login to Azure'
-        uses: azure/login@v2
-        with:
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-
-      - name: 'Set up Terraform'
+      - name: 'Setup'
         uses: hashicorp/setup-terraform@v3
 
-      - name: 'Init and validate'
+      - name: 'Validate'
         run: |
           terraform init -input=false -no-color
           terraform validate -no-color

@@ -1,5 +1,5 @@
 resource "azurerm_storage_container" "tfstate" {
-  name                  = local.group
+  name                  = "tfstate"
   storage_account_id    = azurerm_storage_account.devops.id
   container_access_type = "private"
 }

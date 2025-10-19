@@ -6,8 +6,8 @@ locals {
 
 resource "azurerm_container_registry" "acr" {
   name                = "acr${local.family}${local.group}${random_id.suffix.hex}"
-  resource_group_name = data.azurerm_resource_group.devops.name
-  location            = data.azurerm_resource_group.devops.location
+  resource_group_name = azurerm_resource_group.devops.name
+  location            = azurerm_resource_group.devops.location
   sku                 = "Basic"
   admin_enabled       = false
   tags                = local.tags

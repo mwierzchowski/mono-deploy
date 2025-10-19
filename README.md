@@ -28,6 +28,11 @@ Use these values to configure the backend in all other Terraform modules and wor
 ### Cleanup
 If needed, remove the management lock first in the Azure Portal or with:
 ```bash
-az lock delete --name lock-tfstate --resource-group rg-mono-tfstate
-az group delete --name rg-mono-tfstate --yes
+az lock delete --name lock-devops --resource-group rg-mono-devops
+az group delete --name rg-mono-devops --yes
 ```
+
+### Configuration
+1. Update GH secrets (AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID and AZURE_CLIENT_ID) in mono-deploy.
+2. Update GH secrets in all code repos (e.g. mono-jvm). PLEASE NOTE: there is a different CLIENT_ID.
+3Update TF backend configuration in mono-deploy.

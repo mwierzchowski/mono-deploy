@@ -30,10 +30,6 @@ resource "azurerm_role_assignment" "gha_blob_contrib" {
   principal_id         = azuread_service_principal.gha_cd_terraform.id
 }
 
-output "github_cd_terraform_environment" {
-  value = local.github_cd_env
-}
-
 output "cd_terraform_github_secrets" {
   value = {
     AZURE_CLIENT_ID       = azuread_application.gha_cd_terraform.client_id

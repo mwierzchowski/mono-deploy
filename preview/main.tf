@@ -14,18 +14,24 @@ resource "azurerm_resource_group" "preview" {
   tags     = local.tags
 }
 
-# resource "random_id" "suffix" {
-#   byte_length = 4
-# }
+resource "random_id" "suffix" {
+  byte_length = 4
+}
 
-# resource "azurerm_storage_account" "devops" {
-#  name                            = "st${local.family}${local.group}${random_id.suffix.hex}"
-#  resource_group_name             = azurerm_resource_group.preview.name
-#  location                        = azurerm_resource_group.preview.location
-#  account_tier                    = "Standard"
-#  account_replication_type        = "LRS"
-#  min_tls_version                 = "TLS1_2"
-#  https_traffic_only_enabled      = true
-#  allow_nested_items_to_be_public = false
-#  tags                            = local.tags
-# }
+resource "azurerm_storage_account" "preview" {
+ name                            = "st${local.family}${local.group}${random_id.suffix.hex}"
+ resource_group_name             = azurerm_resource_group.preview.name
+ location                        = azurerm_resource_group.preview.location
+ account_tier                    = "Standard"
+ account_replication_type        = "LRS"
+ min_tls_version                 = "TLS1_2"
+ https_traffic_only_enabled      = true
+ allow_nested_items_to_be_public = false
+ tags                            = local.tags
+}
+
+
+data "azurerm_storage_account" "devops" {
+  name                = "stmonodevops3643ef05"
+  resource_group_name = "rg-mono-devops"
+}

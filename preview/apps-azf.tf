@@ -13,11 +13,6 @@ locals {
   azf_apps = local.azf_cfg.apps
 }
 
-data "azurerm_storage_container" "packages" {
-  name                 = "packages"
-  storage_account_name = data.azurerm_storage_account.devops.name
-}
-
 # One shared plan for the env; uses locals (no hard-coding)
 resource "azurerm_service_plan" "azf_plan" {
   name                = "plan-${local.family}-${local.group}-azf"
@@ -41,7 +36,7 @@ resource "azurerm_user_assigned_identity" "azf" {
 # Allow reading the ZIPs from the packages container
 resource "azurerm_role_assignment" "azf_pkg_reader" {
   for_each             = local.azf_apps
-  scope                = data.azurerm_storage_container.packages.id
+  scope                = data.azurerm_storage_account.devops.id
   role_definition_name = "Storage Blob Data Reader"
   principal_id         = azurerm_user_assigned_identity.azf[each.key].principal_id
 }

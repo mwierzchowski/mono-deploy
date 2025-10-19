@@ -1,4 +1,4 @@
-# tfstate
+# Bootstrap
 This directory contains a one-time Terraform configuration used to create the Azure resources required to store all
 Terraform state files for the project and run GHA workflows.
 
@@ -27,5 +27,6 @@ Use these values to configure the backend in all other Terraform modules and wor
 Do not destroy these resources unless you intend to reset all Terraform states.
 If needed, remove the management lock first in the Azure Portal or with:
 ```bash
-az lock delete –name lock-tfstate –resource-group rg-mono-tfstate
+az lock delete --name lock-tfstate --resource-group rg-mono-tfstate
+az group delete --name rg-mono-tfstate --yes
 ```

@@ -32,6 +32,6 @@ resource "azurerm_storage_account" "preview" {
 
 
 data "azurerm_storage_account" "devops" {
-  name                = "stmonodevops3643ef05"
+  name                = "stmonodevopsb1e7a48d"
   resource_group_name = "rg-mono-devops"
 }

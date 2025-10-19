@@ -1,3 +1,16 @@
+resource "azurerm_resource_group" "tfstate" {
+  name     = "rg-${local.family}-${local.group}"
+  location = local.location
+  tags     = local.tags
+}
+
+resource "azurerm_management_lock" "devops_lock" {
+  name       = "lock-${local.group}"
+  scope      = azurerm_resource_group.tfstate.id
+  lock_level = "CanNotDelete"
+  notes      = "Protect Terraform state resources."
+}
+
 resource "azurerm_storage_account" "tfstate" {
   name                            = "st${local.family}${local.group}${random_id.suffix.hex}"
   resource_group_name             = azurerm_resource_group.tfstate.name

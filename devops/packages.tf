@@ -4,15 +4,8 @@ resource "azurerm_storage_container" "packages" {
   container_access_type = "private"
 }
 
-data "azuread_service_principal" "gha_ci_artifacts" {
-  display_name = "gha-mono-ci-artifacts"
-}
-
-# Allow GitHub Actions (ci-artifacts) to push/pull blobs
-resource "azurerm_role_assignment" "gha_ci_artifacts_blob_contrib" {
-  scope                = azurerm_storage_container.packages.id
-  role_definition_name = "Storage Blob Data Contributor"
-  principal_id         = data.azuread_service_principal.gha_ci_artifacts.id
+output "packages_container_id" {
+  value = azurerm_storage_container.packages.id
 }
 
 output "packages_base_url" {

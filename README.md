@@ -28,8 +28,8 @@ Use these values to configure the backend in all other Terraform modules and wor
 ### Cleanup
 If needed, remove the management lock first in the Azure Portal or with:
 ```bash
-az lock delete --name lock-devops --resource-group rg-mono-devops
-az group delete --name rg-mono-devops --yes
+az lock delete --name lock-tfstate --resource-group rg-mono-tfstate
+az group delete --name rg-mono-tfstate --yes
 ```
 
 ### Configuration

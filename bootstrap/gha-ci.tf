@@ -10,6 +10,7 @@ resource "azuread_service_principal" "gha_ci_artifacts" {
   client_id = azuread_application.gha_ci_artifacts.client_id
 }
 
+# Copy-paste-update for other repositories
 resource "azuread_application_federated_identity_credential" "gha_env_mono_jvm_ci_artifacts" {
   application_id = azuread_application.gha_ci_artifacts.id
   display_name   = "env-${local.github_ci_env}"

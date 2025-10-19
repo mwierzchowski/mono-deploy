@@ -25,7 +25,7 @@ resource "azurerm_role_assignment" "gha_contributor" {
 }
 
 resource "azurerm_role_assignment" "gha_blob_contrib" {
-  scope                = azurerm_storage_account.devops.id
+  scope                = azurerm_storage_account.tfstate.id
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azuread_service_principal.gha_cd_terraform.id
 }
@@ -41,6 +41,3 @@ output "cd_terraform_github_secrets" {
     AZURE_SUBSCRIPTION_ID = data.azurerm_subscription.current.subscription_id
   }
 }
-
-
-

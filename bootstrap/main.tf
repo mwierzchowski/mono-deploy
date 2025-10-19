@@ -1,6 +1,6 @@
 locals {
   family      = "mono"
-  group       = "devops"
+  group       = "tfstate"
   location    = "northeurope"
   github_org  = "mwierzchowski"
   github_repo = "mono-deploy"
@@ -16,7 +16,7 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
-resource "azurerm_resource_group" "devops" {
+resource "azurerm_resource_group" "tfstate" {
   name     = "rg-${local.family}-${local.group}"
   location = local.location
   tags     = local.tags
@@ -24,19 +24,7 @@ resource "azurerm_resource_group" "devops" {
 
 resource "azurerm_management_lock" "devops_lock" {
   name       = "lock-${local.group}"
-  scope      = azurerm_resource_group.devops.id
+  scope      = azurerm_resource_group.tfstate.id
   lock_level = "CanNotDelete"
   notes      = "Protect Terraform state resources."
-}
-
-resource "azurerm_storage_account" "devops" {
-  name                     = "st${local.family}${local.group}${random_id.suffix.hex}"
-  resource_group_name      = azurerm_resource_group.devops.name
-  location                 = azurerm_resource_group.devops.location
-  account_tier             = "Standard"
-  account_replication_type = "LRS"
-  min_tls_version                 = "TLS1_2"
-  https_traffic_only_enabled      = true
-  allow_nested_items_to_be_public = false
-  tags                     = local.tags
 }

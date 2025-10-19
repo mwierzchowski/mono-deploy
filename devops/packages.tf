@@ -4,10 +4,6 @@ resource "azurerm_storage_container" "packages" {
   container_access_type = "private"
 }
 
-output "packages_container_id" {
-  value = azurerm_storage_container.packages.id
-}
-
 output "packages_base_url" {
   value = "https://${azurerm_storage_account.devops.name}.blob.core.windows.net/${azurerm_storage_container.packages.name}"
 }

@@ -1,9 +1,9 @@
 terraform {
   backend "azurerm" {
-    resource_group_name = "rg-mono-tfstate"
-    storage_account_name = "stmonotfzilu5t"
+    resource_group_name = "rg-mono-devops"
+    storage_account_name = "stmonodevopse1125f87"
     container_name       = "tfstate"
-    key                  = "shared.tfstate"
+    key                  = "devops.tfstate"
     use_azuread_auth     = true
   }
 

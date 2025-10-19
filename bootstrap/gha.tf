@@ -1,9 +1,9 @@
 locals {
-  github_cd_env  = "cd-terraform"
+  github_env  = "cd-terraform"
 }
 
 resource "azuread_application" "gha_cd_terraform" {
-  display_name = "gha-${local.family}-${local.github_cd_env}"
+  display_name = "gha-${local.family}-${local.github_env}"
 }
 
 resource "azuread_service_principal" "gha_cd_terraform" {
@@ -12,9 +12,9 @@ resource "azuread_service_principal" "gha_cd_terraform" {
 
 resource "azuread_application_federated_identity_credential" "gha_env_cd_terraform" {
   application_id = azuread_application.gha_cd_terraform.id
-  display_name   = "env-${local.github_cd_env}"
+  display_name   = "env-${local.github_env}"
   issuer         = "https://token.actions.githubusercontent.com"
-  subject        = "repo:${local.github_org}/${local.github_repo}:environment:${local.github_cd_env}"
+  subject        = "repo:${local.github_org}/${local.github_repo}:environment:${local.github_env}"
   audiences      = ["api://AzureADTokenExchange"]
 }
 

@@ -25,8 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEPLOY_REPO: mono-deploy
-      DEPLOY_ENV: primary
-      CONFIG_FILE: primary/apps-azf.yaml
+      DEPLOY_ENV: preview
+      CONFIG_FILE: preview/apps-azf.yaml
     steps:
       - name: 'Sanity check inputs'
         run: |

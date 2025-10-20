@@ -43,3 +43,8 @@ data "azurerm_container_registry" "devops" {
   name                = "acrmonodevopsb1e7a48d"
   resource_group_name = data.azurerm_resource_group.devops.name
 }
+
+data "azurerm_log_analytics_workspace" "devops_law" {
+  name                = "law-mono-devops"
+  resource_group_name = data.azurerm_resource_group.devops.name
+}

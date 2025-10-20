@@ -30,8 +30,16 @@ resource "azurerm_storage_account" "preview" {
  tags                            = local.tags
 }
 
+data "azurerm_resource_group" "devops" {
+  name = "rg-mono-devops"
+}
 
 data "azurerm_storage_account" "devops" {
   name                = "stmonodevopsb1e7a48d"
-  resource_group_name = "rg-mono-devops"
+  resource_group_name = data.azurerm_resource_group.devops.name
+}
+
+data "azurerm_container_registry" "devops" {
+  name                = "acrmonodevopsb1e7a48d"
+  resource_group_name = data.azurerm_resource_group.devops.name
 }

@@ -12,7 +12,12 @@ data "azurerm_resource_group" "devops" {
 
 data "azurerm_storage_account" "devops" {
   name                = "stmonodevopsb1e7a48d"
-  resource_group_name = "rg-mono-devops"
+  resource_group_name = data.azurerm_resource_group.devops.name
+}
+
+data "azurerm_container_registry" "devops" {
+  name                = "acrmonodevopsb1e7a48d"
+  resource_group_name = data.azurerm_resource_group.devops.name
 }
 
 data "azuread_service_principal" "gha_cd_terraform" {

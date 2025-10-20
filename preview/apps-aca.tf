@@ -29,11 +29,17 @@ resource "azurerm_container_app_environment" "apps_env" {
   tags                       = local.tags
 }
 
-resource "azurerm_user_assigned_identity" "aca_acr_pull" {
+resource "azurerm_user_assigned_identity" "uami_acr_pull" {
   name                = "uami-acr-pull"
   resource_group_name = azurerm_resource_group.preview.name
   location            = azurerm_resource_group.preview.location
   tags                = local.tags
+}
+
+resource "azurerm_role_assignment" "aca_acr_pull" {
+  scope                = data.azurerm_container_registry.devops.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.uami_acr_pull.principal_id
 }
 
 resource "azurerm_container_app" "aca_app" {
@@ -43,6 +49,10 @@ resource "azurerm_container_app" "aca_app" {
   resource_group_name          = azurerm_resource_group.preview.name
   container_app_environment_id = azurerm_container_app_environment.apps_env.id
   revision_mode                = each.value.revision_mode
+
+  depends_on = [
+    azurerm_role_assignment.aca_acr_pull
+  ]
 
   identity {
     type         = "UserAssigned"

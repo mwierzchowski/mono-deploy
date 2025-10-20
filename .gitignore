@@ -2,7 +2,11 @@
 **/.terraform/
 **/terraform.tfstate
 **/terraform.tfstate.backup
+**/terraform.tfstate.*              # backups/partials
 **/.local.auto.tfvars
+
+bootstrap/.terraform.lock.hcl
+preview/.terraform.lock.hcl
 
 ### Helm
 **/charts/*.tgz

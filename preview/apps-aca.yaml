@@ -1,1 +1,4 @@
-apps: {}
+apps:
+  smerek:
+    repository: mono-jvm
+    image: acrmonodevopsb1e7a48d.azurecr.io/mono-jvm/smerek:16

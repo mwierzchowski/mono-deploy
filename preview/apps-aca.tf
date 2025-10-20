@@ -21,6 +21,19 @@ locals {
   }
 }
 
+data "azurerm_log_analytics_workspace" "devops_la" {
+  name                = "log-analytics"
+  resource_group_name = data.azurerm_resource_group.devops.name
+}
+
+resource "azurerm_container_app_environment" "apps_env" {
+  name                       = "container-apps"
+  resource_group_name        = azurerm_resource_group.preview.name
+  location                   = azurerm_resource_group.preview.location
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.devops_la.id
+  tags                       = local.tags
+}
+
 resource "azurerm_user_assigned_identity" "aca_acr_pull" {
   name                = "uami-acr-pull"
   resource_group_name = azurerm_resource_group.preview.name

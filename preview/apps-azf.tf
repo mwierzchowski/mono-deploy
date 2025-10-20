@@ -15,9 +15,9 @@ locals {
 
 # One shared plan for the env; uses locals (no hard-coding)
 resource "azurerm_service_plan" "azf_plan" {
-  name                = "plan-${local.family}-${local.env}-azf"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  name                = "plan-${local.family}-${local.group}-azf"
+  resource_group_name = azurerm_resource_group.preview.name
+  location            = azurerm_resource_group.preview.location
 
   os_type  = local.azf_defaults.plan_os_type
   sku_name = local.azf_defaults.plan_sku_name
@@ -27,16 +27,16 @@ resource "azurerm_service_plan" "azf_plan" {
 # Per-app identity (clean RBAC)
 resource "azurerm_user_assigned_identity" "azf" {
   for_each            = local.azf_apps
-  name                = "uami-${each.key}-${local.env}"
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  name                = "uami-${each.key}-${local.group}"
+  resource_group_name = azurerm_resource_group.preview.name
+  location            = azurerm_resource_group.preview.location
   tags                = local.tags
 }
 
 # Allow reading the ZIPs from the packages container
 resource "azurerm_role_assignment" "azf_pkg_reader" {
   for_each             = local.azf_apps
-  scope                = azurerm_storage_container.packages.id
+  scope                = data.azurerm_storage_account.devops.id
   role_definition_name = "Storage Blob Data Reader"
   principal_id         = azurerm_user_assigned_identity.azf[each.key].principal_id
 }
@@ -46,13 +46,13 @@ resource "azurerm_linux_function_app" "azf_app" {
   for_each            = local.azf_apps
 
   name                = each.key
-  resource_group_name = azurerm_resource_group.rg.name
-  location            = azurerm_resource_group.rg.location
+  resource_group_name = azurerm_resource_group.preview.name
+  location            = azurerm_resource_group.preview.location
   service_plan_id     = azurerm_service_plan.azf_plan.id
 
   # Host storage for Functions runtime
-  storage_account_name       = azurerm_storage_account.sa.name
-  storage_account_access_key = azurerm_storage_account.sa.primary_access_key
+  storage_account_name       = azurerm_storage_account.preview.name
+  storage_account_access_key = azurerm_storage_account.preview.primary_access_key
 
   identity {
     type         = "UserAssigned"

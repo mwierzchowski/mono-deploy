@@ -1,10 +1,9 @@
-name: primary
+name: preview
 
 on:
   workflow_dispatch:
   push:
-    branches: [ 'main' ]
-    paths: [ 'primary/**' ]
+    paths: [ 'preview/**' ]
 
 concurrency:
   group: ${{github.workflow}}
@@ -17,31 +16,24 @@ permissions:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: cd-tf
+    environment: cd-terraform
+    env:
+      ARM_USE_OIDC: 'true'
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      TF_IN_AUTOMATION: 'true'
     defaults:
       run:
         working-directory: ${{github.workflow}}
-    env:
-      ARM_USE_OIDC: 'true'
-      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-      TF_IN_AUTOMATION: 'true'
     steps:
-      - name: 'Checkout repository'
+      - name: 'Checkout'
         uses: actions/checkout@v5
 
-      - name: 'Login to Azure'
-        uses: azure/login@v2
-        with:
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-
-      - name: 'Set up Terraform'
+      - name: 'Setup'
         uses: hashicorp/setup-terraform@v3
 
-      - name: 'Init and validate'
+      - name: 'Validate'
         run: |
           terraform init -input=false -no-color
           terraform validate -no-color

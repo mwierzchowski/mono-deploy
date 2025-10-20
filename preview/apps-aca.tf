@@ -11,7 +11,7 @@ locals {
     ingress_target_port       = 80
     ingress_transport         = "auto"
     revision_mode             = "Single"
-    registry_server           = azurerm_container_registry.acr.login_server
+    registry_server           = data.azurerm_container_registry.devops.login_server
   }
 
   # Merge defaults with app-specific config
@@ -21,23 +21,48 @@ locals {
   }
 }
 
+resource "azurerm_container_app_environment" "apps_env" {
+  name                       = "container-apps"
+  resource_group_name        = azurerm_resource_group.preview.name
+  location                   = azurerm_resource_group.preview.location
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.devops_law.id
+  tags                       = local.tags
+}
+
+resource "azurerm_user_assigned_identity" "uami_acr_pull" {
+  name                = "uami-acr-pull"
+  resource_group_name = azurerm_resource_group.preview.name
+  location            = azurerm_resource_group.preview.location
+  tags                = local.tags
+}
+
+resource "azurerm_role_assignment" "aca_acr_pull" {
+  scope                = data.azurerm_container_registry.devops.id
+  role_definition_name = "AcrPull"
+  principal_id         = azurerm_user_assigned_identity.uami_acr_pull.principal_id
+}
+
 resource "azurerm_container_app" "aca_app" {
   for_each = local.aca_apps
 
   name                         = each.key
-  resource_group_name          = azurerm_resource_group.rg.name
+  resource_group_name          = azurerm_resource_group.preview.name
   container_app_environment_id = azurerm_container_app_environment.apps_env.id
   revision_mode                = each.value.revision_mode
 
+  depends_on = [
+    azurerm_role_assignment.aca_acr_pull
+  ]
+
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.acr_pull.id]
+    identity_ids = [azurerm_user_assigned_identity.uami_acr_pull.id]
   }
 
   # Required even if ACR is part of image name (for auth)
   registry {
     server   = each.value.registry_server
-    identity = azurerm_user_assigned_identity.acr_pull.id
+    identity = azurerm_user_assigned_identity.uami_acr_pull.id
   }
 
   ingress {
@@ -67,10 +92,11 @@ resource "azurerm_container_app" "aca_app" {
         }
       }
 
+      # TODO Do I need this if I do not deploy more AZFs as images?
       # Shared storage for Azure Functions
       env {
         name  = "AzureWebJobsStorage"
-        value = azurerm_storage_account.sa.primary_connection_string
+        value = azurerm_storage_account.preview.primary_connection_string
       }
     }
 

@@ -56,13 +56,13 @@ resource "azurerm_container_app" "aca_app" {
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.aca_acr_pull.id]
+    identity_ids = [azurerm_user_assigned_identity.uami_acr_pull.id]
   }
 
   # Required even if ACR is part of image name (for auth)
   registry {
     server   = each.value.registry_server
-    identity = azurerm_user_assigned_identity.aca_acr_pull.id
+    identity = azurerm_user_assigned_identity.uami_acr_pull.id
   }
 
   ingress {

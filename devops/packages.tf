@@ -16,7 +16,7 @@ resource "azurerm_storage_management_policy" "devops_storage_policy" {
       prefix_match = ["packages/"]
       match_blob_index_tag {
         name      = "stage"
-        operation = "Equals"
+        operation = "=="
         value     = "dev"
       }
     }

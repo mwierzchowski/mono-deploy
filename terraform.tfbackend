@@ -1,0 +1,3 @@
+resource_group_name  = "rg-mono-tfstate"
+storage_account_name = "stmonotfstate3d06cffe"
+container_name       = "tfstate"

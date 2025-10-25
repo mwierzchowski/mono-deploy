@@ -1,0 +1,4 @@
+apps:
+  smerek:
+    repository: mono-jvm
+    package_url: https://stmonodevops86457c46.blob.core.windows.net/artifacts/mono-jvm/smerek/17/functions.zip

@@ -25,8 +25,8 @@ jobs:
     runs-on: ubuntu-latest
     env:
       DEPLOY_REPO: mono-deploy
-      DEPLOY_ENV: preview
-      CONFIG_FILE: preview/apps-aca.yaml
+      DEPLOY_ENV: envs/preview
+      CONFIG_FILE: envs/preview/apps-aca.yaml
     steps:
       - name: 'Sanity check inputs'
         run: |
@@ -74,4 +74,4 @@ jobs:
           message: 'Deploy ${{ steps.short-image.outputs.value }}'
 
       - name: 'Show deployment link'
-        run: echo "::notice ::https://github.com/${{ github.repository_owner }}/${{ env.DEPLOY_REPO }}/actions/workflows/${{ env.DEPLOY_ENV }}.yaml"
+        run: echo "::notice ::https://github.com/${{ github.repository_owner }}/${{ env.DEPLOY_REPO }}/actions/workflows/preview.yaml"

@@ -1,38 +1,82 @@
 # mono-deploy
 
-## Bootstrap
-Deployment automation requires Terraform state which cannot be automated due to chicken-and-egg problem. Also,
-automation requires service principals which should not be assigned automatically because of security concerns. That is
-why starting new automation requires manual steps covered by bootstrap configuration. 
+Starting (or starting-over) infra provisioning and CD automation require manual setup steps before first executiuon due 
+to a chicken-and-egg problem: 
+- Terraform requires tfstate for reproductibility which is one-time step only.
+- GitHub Actions require service principals to run Terraform.
+Additionally, CI automation requires a service principal to be able to push images or artifacts to Azure which 
+should not be granted by GitHub actions itself to minimize potential security incident blast radius.   
 
-### Prerequisites
-1. You must have Azure CLI and Terraform installed. Use tools like Brew.
-2. You must be logged in to Azure CLI with an account that has Contributor rights:
+## Setup
+
+> [!TIP]
+> User have to be in the root directory of the repository and logged in to Azure CLI. See
+> [Troubleshooting](#troubleshooting) for more details.
+
+### Create tfstate backend
+```bash
+terraform -chdir=./base/tfstate init
+terraform -chdir=./base/tfstate apply -auto-approve -var-file=../../terraform.tfvars
+```
+
+### Deploy devops stack
+
+```bash
+terraform -chdir=./base/devops init -backend-config=../../terraform.tfbackend
+terraform -chdir=./base/devops apply -auto-approve -var-file=../../terraform.tfvars
+```
+Update GH secrets (`AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID` and `AZURE_CLIENT_ID`) in:
+1. [mono-deploy](https://github.com/mwierzchowski/mono-deploy/settings/secrets/actions)
+2. [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions)
+3. ... and other code repos
+
+## Troubleshooting
+
+### Mono-deploy PAT has expired
+1. Regenerate [`mono-deploy-write`](https://github.com/settings/personal-access-tokens/9082055) PAT.
+2. Update [`MONO_DEPLOY_PUSH_TOKEN`](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions/MONO_DEPLOY_PUSH_TOKEN)
+   secret in mono-jvm.
+3. ... and in other code repos.
+
+### Azure login
 ```bash
 az login
-az account set –subscription <SUBSCRIPTION_ID>
-```
-3. Confirm the correct subscription is selected:
-```bash
-az account show
+export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
+export ARM_TENANT_ID=$(az account show --query tenantId -o tsv)
 ```
 
-### How to run
+### Delete protected resources
+DevOps:
 ```bash
-terraform init
-terraform apply
+az lock delete --name devops-st-lock --resource-group rg-mono-devops
+az lock delete --name devops-acr-lock --resource-group rg-mono-devops
+az group delete --name rg-mono-devops --yes
 ```
-Terraform will create the resource group and storage account, then print outputs with the backend configuration details.
-Use these values to configure the backend in all other Terraform modules and workflows.
-
-### Cleanup
-If needed, remove the management lock first in the Azure Portal or with:
+Tfstate:
 ```bash
-az lock delete --name lock-tfstate --resource-group rg-mono-tfstate
+az lock delete --name tfstate-lock --resource-group rg-mono-tfstate
 az group delete --name rg-mono-tfstate --yes
 ```
 
-### Configuration
-1. Update GH secrets (AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID and AZURE_CLIENT_ID) in mono-deploy.
-2. Update GH secrets in all code repos (e.g. mono-jvm). PLEASE NOTE: there is a different CLIENT_ID.
-3Update TF backend configuration in mono-deploy.
+### Terraform backend has changed
+Update:
+1. `terraform.tfbackend` / `storage_account_name`
+2. `terraform.tfvars` / `tfstate.storage`
+
+### DevOps storage and/or ACR have changed
+Update:
+1. File `terraform.tfvars` / `devops.storage`
+2. File `terraform.tfvars` / `devops.registry`
+3. GH Variables (`ARTIFACT_CONTAINER`, `ARTIFACT_STORAGE`, `IMAGE_REGISTRY`) in
+   [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/variables/actions)
+4. ... and in other code repos
+
+### Delete Entra apps
+Delete app [registrations](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps)
+in  Azure Portal.
+
+### Generate new random suffix
+```bash
+terraform -chdir=./bootstrap/random_suffix init
+terraform -chdir=./bootstrap/random_suffix apply -auto-approve
+```

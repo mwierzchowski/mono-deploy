@@ -1,0 +1,51 @@
+locals {
+  acr_purge_dev_cmd    = "acr purge --filter '*:.*-dev\\..*' --ago ${var.devops.purge.dev_days}d"
+  acr_purge_stable_cmd = "acr purge '*:^\\d+$' --ago 0d --keep ${var.devops.purge.stable_count}"
+  acr_purge_schedule   = "0 2 * * *"
+}
+
+resource "azurerm_container_registry" "acr" {
+  name                = var.devops.registry
+  resource_group_name = azurerm_resource_group.devops.name
+  location            = azurerm_resource_group.devops.location
+  sku                 = var.devops.acr_sku
+  admin_enabled       = false
+  tags                = local.tags
+}
+
+resource "azurerm_management_lock" "devops_acr_lock" {
+  name       = "${local.stack}-acr-lock"
+  scope      = azurerm_container_registry.acr.id
+  lock_level = "CanNotDelete"
+  notes      = "Prevent accidental deletion of ACR."
+}
+
+resource "azurerm_container_registry_task" "acr_purge" {
+  name                  = "task-acr-purge"
+  container_registry_id = azurerm_container_registry.acr.id
+  is_system_task        = false
+  tags                  = azurerm_resource_group.devops.tags
+
+  platform {
+    os = "Linux"
+  }
+
+  encoded_step {
+    task_content = <<-YAML
+      version: v1.1.0
+      steps:
+        - cmd: ${local.acr_purge_dev_cmd}
+        - cmd: ${local.acr_purge_stable_cmd}
+      YAML
+  }
+
+  timer_trigger {
+    enabled  = true
+    name     = "scheduled"
+    schedule = local.acr_purge_schedule
+  }
+}
+
+output "IMAGE_REGISTRY" {
+  value = azurerm_container_registry.acr.login_server
+}

@@ -1,0 +1,22 @@
+terraform {
+  required_version = ">= 1.8"
+  backend "azurerm" {
+    key = "devops.tfstate"
+  }
+  required_providers {
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0"
+    }
+    azuread = {
+      source = "hashicorp/azuread",
+      version = "~> 2.50"
+    }
+  }
+}
+
+provider "azurerm" {
+  features {}
+}
+
+provider "azuread" {}

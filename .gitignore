@@ -5,9 +5,6 @@
 **/terraform.tfstate.*
 **/.local.auto.tfvars
 
-bootstrap/.terraform.lock.hcl
-devops-rbac/.terraform.lock.hcl
-
 ### Helm
 **/charts/*.tgz
 

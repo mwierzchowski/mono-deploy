@@ -1,21 +1,36 @@
+resource "random_id" "suffix" {
+  byte_length = 4
+}
+
 locals {
-  service      = "devops"
-  group_name     = "rg-${var.family}-${local.service}"
-  storage_name   = "st${var.family}${local.service}${var.devops.suffix}"
-  github_ci_name = "${var.family}-continuous-integration"
+  stack   = "preview"
+  group   = "rg-${var.family}-${local.stack}"
+  storage = "st${var.family}${local.stack}${random_id.suffix.hex}"
+  tags = {
+    repo  = var.repo
+    stack = local.stack
+  }
+  devops_group = "rg-${var.family}-devops"
 }
 
-data "azurerm_subscription" "current" {}
-
-data "azurerm_resource_group" "devops" {
-  name = local.group_name
+resource "azurerm_resource_group" "preview" {
+  name     = local.group
+  location = var.location
+  tags     = local.tags
 }
 
-data "azurerm_storage_account" "devops" {
-  name                = local.storage_name
-  resource_group_name = data.azurerm_resource_group.devops.name
+resource "azurerm_storage_account" "preview" {
+  name                            = local.storage
+  resource_group_name             = azurerm_resource_group.preview.name
+  location                        = azurerm_resource_group.preview.location
+  account_tier                    = var.storage_defaults.tier
+  account_replication_type        = var.storage_defaults.replication
+  min_tls_version                 = var.storage_defaults.tls_version
+  https_traffic_only_enabled      = var.storage_defaults.https_only
+  allow_nested_items_to_be_public = var.storage_defaults.nested_public
+  tags                            = local.tags
 }
 
-data "azuread_service_principal" "github_ci" {
-  display_name = local.github_ci_name
+output "storage" {
+  value = azurerm_storage_account.preview.name
 }

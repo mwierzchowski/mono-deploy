@@ -1,68 +1,64 @@
 locals {
-  aca_cfg = yamldecode(file("${path.module}/apps-aca.yaml"))
-
-  # Central defaults (overridable per app in YAML)
-  aca_default = {
-    cpu                       = 0.25
-    memory                    = "0.5Gi"
-    min_replicas              = 0
-    max_replicas              = 1
-    ingress_external_enabled  = true
-    ingress_target_port       = 80
-    ingress_transport         = "auto"
-    revision_mode             = "Single"
-    registry_server           = data.azurerm_container_registry.devops.login_server
-  }
-
-  # Merge defaults with app-specific config
+  aca_name = "aca-${var.family}-${local.stack}"
+  aca_cfg  = yamldecode(file("${path.module}/apps-aca.yaml"))
   aca_apps = {
     for name, cfg in local.aca_cfg.apps :
-    name => merge(local.aca_default, cfg)
+    name => merge(var.aca_defaults, cfg)
   }
+  devops_law   = "law-${var.family}-devops"
 }
 
-resource "azurerm_container_app_environment" "apps_env" {
-  name                       = "container-apps"
+data "azurerm_log_analytics_workspace" "devops" {
+  name                = local.devops_law
+  resource_group_name = local.devops_group
+}
+
+data "azurerm_container_registry" "devops" {
+  name                = var.devops.registry
+  resource_group_name = local.devops_group
+}
+
+resource "azurerm_container_app_environment" "preview" {
+  name                       = local.aca_name
   resource_group_name        = azurerm_resource_group.preview.name
   location                   = azurerm_resource_group.preview.location
-  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.devops_law.id
+  log_analytics_workspace_id = data.azurerm_log_analytics_workspace.devops.id
   tags                       = local.tags
 }
 
-resource "azurerm_user_assigned_identity" "uami_acr_pull" {
-  name                = "uami-acr-pull"
+resource "azurerm_user_assigned_identity" "uami_aca" {
+  name                = "uami-${var.family}-${local.stack}-aca"
   resource_group_name = azurerm_resource_group.preview.name
   location            = azurerm_resource_group.preview.location
   tags                = local.tags
 }
 
-resource "azurerm_role_assignment" "aca_acr_pull" {
+resource "azurerm_role_assignment" "uami_aca_acr_pull" {
   scope                = data.azurerm_container_registry.devops.id
   role_definition_name = "AcrPull"
-  principal_id         = azurerm_user_assigned_identity.uami_acr_pull.principal_id
+  principal_id         = azurerm_user_assigned_identity.uami_aca.principal_id
 }
 
 resource "azurerm_container_app" "aca_app" {
   for_each = local.aca_apps
-
   name                         = each.key
   resource_group_name          = azurerm_resource_group.preview.name
-  container_app_environment_id = azurerm_container_app_environment.apps_env.id
+  container_app_environment_id = azurerm_container_app_environment.preview.id
   revision_mode                = each.value.revision_mode
 
   depends_on = [
-    azurerm_role_assignment.aca_acr_pull
+    azurerm_role_assignment.uami_aca_acr_pull
   ]
 
   identity {
     type         = "UserAssigned"
-    identity_ids = [azurerm_user_assigned_identity.uami_acr_pull.id]
+    identity_ids = [azurerm_user_assigned_identity.uami_aca.id]
   }
 
   # Required even if ACR is part of image name (for auth)
   registry {
-    server   = each.value.registry_server
-    identity = azurerm_user_assigned_identity.uami_acr_pull.id
+    server   = var.devops.registry
+    identity = azurerm_user_assigned_identity.uami_aca.id
   }
 
   ingress {
@@ -110,7 +106,6 @@ resource "azurerm_container_app" "aca_app" {
   }
 }
 
-# Useful outputs: FQDNs per app
 output "aca_fqdns" {
   value = { for name, app in azurerm_container_app.aca_app : name => app.ingress[0].fqdn }
 }

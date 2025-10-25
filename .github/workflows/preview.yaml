@@ -3,7 +3,7 @@ name: preview
 on:
   workflow_dispatch:
   push:
-    paths: [ 'preview/**' ]
+    paths: [ 'envs/preview/**' ]
 
 concurrency:
   group: ${{github.workflow}}
@@ -16,16 +16,13 @@ permissions:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: cd-terraform
+    environment: deployer
     env:
       ARM_USE_OIDC: 'true'
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       TF_IN_AUTOMATION: 'true'
-    defaults:
-      run:
-        working-directory: ${{github.workflow}}
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v5
@@ -35,8 +32,13 @@ jobs:
 
       - name: 'Validate'
         run: |
-          terraform init -input=false -no-color
-          terraform validate -no-color
+          terraform -chdir=./envs/preview \
+                     init -input=false -no-color \
+                    -backend-config=../../terraform.tfbackend
+          terraform -chdir=./envs/preview validate -no-color
 
       - name: 'Apply'
-        run: terraform apply -auto-approve -input=false -no-color -compact-warnings
+        run: |
+          terraform -chdir=./envs/preview \
+                     apply -auto-approve -input=false -no-color -compact-warnings \
+                    -var-file=../../terraform.tfvars

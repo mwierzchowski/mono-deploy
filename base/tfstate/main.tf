@@ -17,18 +17,18 @@ resource "azurerm_storage_account" "tfstate" {
   name                            = var.tfstate.storage
   resource_group_name             = azurerm_resource_group.tfstate.name
   location                        = azurerm_resource_group.tfstate.location
-  account_tier                    = var.storage.tier
-  account_replication_type        = var.storage.replication
-  min_tls_version                 = var.storage.tls_version
-  https_traffic_only_enabled      = var.storage.https_only
-  allow_nested_items_to_be_public = var.storage.nested_public
+  account_tier                    = var.storage_defaults.tier
+  account_replication_type        = var.storage_defaults.replication
+  min_tls_version                 = var.storage_defaults.tls_version
+  https_traffic_only_enabled      = var.storage_defaults.https_only
+  allow_nested_items_to_be_public = var.storage_defaults.nested_public
   tags                            = local.tags
 }
 
 resource "azurerm_storage_container" "container" {
   name                  = local.stack
   storage_account_id    = azurerm_storage_account.tfstate.id
-  container_access_type = var.storage.access
+  container_access_type = var.storage_defaults.access
 }
 
 resource "azurerm_management_lock" "rg_lock" {

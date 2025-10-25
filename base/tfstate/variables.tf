@@ -17,7 +17,7 @@ variable "tfstate" {
   })
 }
 
-variable "storage" {
+variable "storage_defaults" {
   type = object({
     tier          = string
     replication   = string

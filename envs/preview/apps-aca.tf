@@ -57,7 +57,7 @@ resource "azurerm_container_app" "aca_app" {
 
   # Required even if ACR is part of image name (for auth)
   registry {
-    server   = var.devops.registry
+    server   = "${var.devops.registry}.azurecr.io"
     identity = azurerm_user_assigned_identity.uami_aca.id
   }
 

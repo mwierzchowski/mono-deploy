@@ -5,6 +5,7 @@ locals {
     repo  = var.repo
     stack = local.stack
   }
+  ci_name = "${var.family}-publisher"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -25,9 +26,10 @@ resource "azurerm_storage_account" "st" {
   tags                            = local.tags
 }
 
-# data "azuread_service_principal" "github_ci" {
-#   display_name = local.github_ci_name
-# }
+data "azuread_service_principal" "app_ci" {
+  display_name = local.ci_name
+}
+
 
 
 # TODO devops lock?

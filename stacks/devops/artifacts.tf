@@ -8,13 +8,13 @@ resource "azurerm_storage_container" "artifacts" {
   container_access_type = var.devops.artifacts_access
 }
 
-# # Allow GitHub Actions (ci-artifacts) to push/pull blobs
-# resource "azurerm_role_assignment" "github_ci_packages_owner" {
-#   scope                = data.azurerm_storage_account.devops.id
-#   role_definition_name = "Storage Blob Data Owner"
-#   principal_id         = data.azuread_service_principal.github_ci.id
-# }
-#
+# Allow GitHub Actions (ci-artifacts) to push/pull blobs
+resource "azurerm_role_assignment" "app_ci_packages_owner" {
+  scope                = azurerm_storage_account.st.id
+  role_definition_name = "Storage Blob Data Owner"
+  principal_id         = data.azuread_service_principal.app_ci.id
+}
+
 # resource "azurerm_storage_management_policy" "devops_storage_policy" {
 #   storage_account_id = data.azurerm_storage_account.devops.id
 #

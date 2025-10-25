@@ -19,9 +19,7 @@ variable "devops" {
     https_only    = optional(bool, true)
     nested_public = optional(bool, false)
     access        = optional(string, "private")
-    law = object({
-      sku       = optional(string, "PerGB2018")
-      retention = optional(number, 30)
-    })
+    law_sku       = optional(string, "PerGB2018")
+    law_retention = optional(number, 30)
   })
 }

@@ -31,7 +31,7 @@ resource "azurerm_storage_container" "container" {
   container_access_type = var.storage_defaults.access
 }
 
-resource "azurerm_management_lock" "rg_lock" {
+resource "azurerm_management_lock" "tfstate_lock" {
   name       = "${local.stack}-lock"
   scope      = azurerm_resource_group.tfstate.id
   lock_level = "CanNotDelete"

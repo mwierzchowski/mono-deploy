@@ -32,8 +32,8 @@ resource "azurerm_storage_container" "container" {
 }
 
 resource "azurerm_management_lock" "tfstate_lock" {
-  name       = "${local.stack}-lock"
-  scope      = azurerm_resource_group.tfstate.id
+  name       = "${local.stack}-st-lock"
+  scope      = azurerm_storage_account.tfstate.id
   lock_level = "CanNotDelete"
   notes      = "Prevent accidental deletion of this resource group."
 }

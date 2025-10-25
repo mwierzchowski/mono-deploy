@@ -17,16 +17,19 @@ should not be granted by GitHub actions itself to minimize potential security in
 ### Tfstate
 ```bash
 terraform -chdir=./bootstrap/tfstate init
-terraform -chdir=./bootstrap/tfstate apply -auto-approve \
+terraform -chdir=./bootstrap/tfstate \
+           apply -auto-approve \
           -var-file=../../terraform.tfvars
 ```
 
 ### GitHub Actions
 
 ```bash
-terraform -chdir=./bootstrap/github_actions init \
+terraform -chdir=./bootstrap/github_actions \
+           init \
           -backend-config=../../terraform.tfbackend
-terraform -chdir=./bootstrap/github_actions apply -auto-approve \
+terraform -chdir=./bootstrap/github_actions \
+           apply -auto-approve \
           -var-file=../../terraform.tfvars
 ```
 Update secrets (AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID and AZURE_CLIENT_ID) in:

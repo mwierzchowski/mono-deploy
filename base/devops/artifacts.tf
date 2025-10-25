@@ -2,6 +2,25 @@ locals {
   artifact_container = "artifacts"
 }
 
+resource "azurerm_storage_account" "devops" {
+  name                            = var.devops.storage
+  resource_group_name             = azurerm_resource_group.devops.name
+  location                        = azurerm_resource_group.devops.location
+  account_tier                    = var.storage_defaults.tier
+  account_replication_type        = var.storage_defaults.replication
+  min_tls_version                 = var.storage_defaults.tls_version
+  https_traffic_only_enabled      = var.storage_defaults.https_only
+  allow_nested_items_to_be_public = var.storage_defaults.nested_public
+  tags                            = local.tags
+}
+
+resource "azurerm_management_lock" "devops_st_lock" {
+  name       = "${local.stack}-st-lock"
+  scope      = azurerm_storage_account.devops.id
+  lock_level = "CanNotDelete"
+  notes      = "Prevent accidental deletion of storage."
+}
+
 resource "azurerm_storage_container" "artifacts" {
   name                  = local.artifact_container
   storage_account_id    = azurerm_storage_account.devops.id

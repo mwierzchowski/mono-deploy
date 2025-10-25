@@ -13,6 +13,13 @@ resource "azurerm_container_registry" "acr" {
   tags                = local.tags
 }
 
+resource "azurerm_management_lock" "devops_acr_lock" {
+  name       = "${local.stack}-acr-lock"
+  scope      = azurerm_container_registry.acr.id
+  lock_level = "CanNotDelete"
+  notes      = "Prevent accidental deletion of ACR."
+}
+
 resource "azurerm_container_registry_task" "acr_purge" {
   name                  = "task-acr-purge"
   container_registry_id = azurerm_container_registry.acr.id

@@ -1,9 +1,9 @@
 locals {
-  artifacts_container = "artifacts"
+  artifact_container = "artifacts"
 }
 
 resource "azurerm_storage_container" "artifacts" {
-  name                  = local.artifacts_container
+  name                  = local.artifact_container
   storage_account_id    = azurerm_storage_account.st.id
   container_access_type = var.devops.artifacts_access
 }
@@ -42,7 +42,7 @@ resource "azurerm_storage_container" "artifacts" {
 #
 
 output "ARTIFACT_STORAGE" {
-  value = azurerm_storage_container.artifacts.storage_account_name
+  value = var.devops.storage
 }
 
 output "ARTIFACT_CONTAINER" {

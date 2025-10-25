@@ -57,5 +57,8 @@ In case of changed Terraform backend following entries have to be updated:
 1. `terraform.tfbackend`
 2. `terraform.tfvars`
 
-TODO random suffix generation
-TODO devops lock?
+### New random suffix
+```bash
+terraform -chdir=./bootstrap/random_suffix init
+terraform -chdir=./bootstrap/random_suffix apply -auto-approve
+```

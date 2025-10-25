@@ -19,11 +19,11 @@ resource "azurerm_storage_account" "devops" {
   name                            = var.devops.storage
   resource_group_name             = azurerm_resource_group.devops.name
   location                        = azurerm_resource_group.devops.location
-  account_tier                    = var.storage.tier
-  account_replication_type        = var.storage.replication
-  min_tls_version                 = var.storage.tls_version
-  https_traffic_only_enabled      = var.storage.https_only
-  allow_nested_items_to_be_public = var.storage.nested_public
+  account_tier                    = var.storage_defaults.tier
+  account_replication_type        = var.storage_defaults.replication
+  min_tls_version                 = var.storage_defaults.tls_version
+  https_traffic_only_enabled      = var.storage_defaults.https_only
+  allow_nested_items_to_be_public = var.storage_defaults.nested_public
   tags                            = local.tags
 }
 

@@ -5,7 +5,7 @@ locals {
 resource "azurerm_storage_container" "artifacts" {
   name                  = local.artifact_container
   storage_account_id    = azurerm_storage_account.devops.id
-  container_access_type = var.storage.access
+  container_access_type = var.storage_defaults.access
 }
 
 resource "azurerm_storage_management_policy" "devops_storage_policy" {
@@ -27,7 +27,7 @@ resource "azurerm_storage_management_policy" "devops_storage_policy" {
 
     actions {
       base_blob {
-        delete_after_days_since_modification_greater_than = 1
+        delete_after_days_since_modification_greater_than = var.devops.purge.dev_days
       }
     }
   }

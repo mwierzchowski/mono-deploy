@@ -35,9 +35,7 @@ jobs:
           terraform -chdir=./stacks/devops \
                      init -input=false -no-color \
                     -backend-config=../../terraform.tfbackend
-          terraform -chdir=./stacks/devops \
-                     validate -no-color \
-                    -var-file=../../terraform.tfvars
+          terraform -chdir=./stacks/devops validate -no-color
 
       - name: 'Apply'
         run: |

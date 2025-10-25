@@ -29,8 +29,9 @@ terraform -chdir=./base/devops apply -auto-approve -var-file=../../terraform.tfv
 Update GH secrets (`AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID` and `AZURE_CLIENT_ID`) in:
 1. [mono-deploy](https://github.com/mwierzchowski/mono-deploy/settings/secrets/actions)
 2. [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions)
-3. ... and other code repos.
+3. ... and other code repos
 
+<a name="troubleshooting"></a>
 ## Troubleshooting
 
 ### Mono-deploy PAT has expired
@@ -70,7 +71,7 @@ Update:
 2. File `terraform.tfvars` / `devops.registry`
 3. GH Variables (`ARTIFACT_CONTAINER`, `ARTIFACT_STORAGE`, `IMAGE_REGISTRY`) in
    [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/variables/actions)
-4. ... and in other code repos.
+4. ... and in other code repos
 
 ### Delete Entra apps
 Delete app [registrations](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps)

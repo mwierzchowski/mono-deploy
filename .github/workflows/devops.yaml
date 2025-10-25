@@ -32,10 +32,15 @@ jobs:
 
       - name: 'Validate'
         run: |
-          terraform -chdir=./stacks/devops init -input=false -no-color \
+          terraform -chdir=./stacks/devops \
+                     init -input=false -no-color \
                     -backend-config=../../terraform.tfbackend
-          terraform -chdir=./stacks/devops validate -no-color
+          terraform -chdir=./stacks/devops \
+                     validate -no-color \
+                    -var-file=../../terraform.tfvars
 
       - name: 'Apply'
         run: |
-          terraform -chdir=./stacks/devops apply -auto-approve -input=false -no-color -compact-warnings
+          terraform -chdir=./stacks/devops \
+                     apply -auto-approve -input=false -no-color -compact-warnings \
+                    -var-file=../../terraform.tfvars

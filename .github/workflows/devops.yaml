@@ -23,9 +23,6 @@ jobs:
       ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
       ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
       TF_IN_AUTOMATION: 'true'
-    defaults:
-      run:
-        working-directory: stacks/${{github.workflow}}
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v5

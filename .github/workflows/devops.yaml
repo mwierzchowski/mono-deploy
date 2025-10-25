@@ -3,7 +3,7 @@ name: devops
 on:
   workflow_dispatch:
   push:
-    paths: [ 'devops/**' ]
+    paths: [ 'stacks/devops/**' ]
 
 concurrency:
   group: ${{github.workflow}}
@@ -16,7 +16,7 @@ permissions:
 jobs:
   Deploy:
     runs-on: ubuntu-latest
-    environment: cd-terraform
+    environment: deployer
     env:
       ARM_USE_OIDC: 'true'
       ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
@@ -35,8 +35,10 @@ jobs:
 
       - name: 'Validate'
         run: |
-          terraform init -input=false -no-color
-          terraform validate -no-color
+          terraform -chdir=./stacks/devops init -input=false -no-color \
+                    -backend-config=../../terraform.tfbackend
+          terraform -chdir=./stacks/devops validate -no-color
 
       - name: 'Apply'
-        run: terraform apply -auto-approve -input=false -no-color -compact-warnings
+        run: |
+          terraform -chdir=./stacks/devops apply -auto-approve -input=false -no-color -compact-warnings

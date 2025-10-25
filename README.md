@@ -31,7 +31,6 @@ Update GH secrets (`AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID` and `AZURE_CLIENT_
 2. [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions)
 3. ... and other code repos
 
-<a name="troubleshooting"></a>
 ## Troubleshooting
 
 ### Mono-deploy PAT has expired

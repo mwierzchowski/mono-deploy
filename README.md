@@ -29,7 +29,9 @@ terraform -chdir=./bootstrap/github_actions init \
 terraform -chdir=./bootstrap/github_actions apply -auto-approve \
           -var-file=../../terraform.tfvars
 ```
-Update GH secrets (AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID and AZURE_CLIENT_ID) in mono-deploy and all code repos.
+Update secrets (AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID and AZURE_CLIENT_ID) in:
+1. [mono-deploy](https://github.com/mwierzchowski/mono-deploy/settings/secrets/actions)
+2. [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions)
 
 ## Troubleshooting
 

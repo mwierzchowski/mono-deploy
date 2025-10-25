@@ -1,13 +1,13 @@
-# locals {
-#   pkg_container_name = "packages"
-# }
-#
-# resource "azurerm_storage_container" "packages" {
-#   name                  = local.pkg_container_name
-#   storage_account_id    = data.azurerm_storage_account.devops.id
-#   container_access_type = "private"
-# }
-#
+locals {
+  artifacts_container = "artifacts"
+}
+
+resource "azurerm_storage_container" "artifacts" {
+  name                  = local.artifacts_container
+  storage_account_id    = azurerm_storage_account.st.id
+  container_access_type = var.devops.artifacts_access
+}
+
 # # Allow GitHub Actions (ci-artifacts) to push/pull blobs
 # resource "azurerm_role_assignment" "github_ci_packages_owner" {
 #   scope                = data.azurerm_storage_account.devops.id
@@ -40,6 +40,11 @@
 #   }
 # }
 #
-# output "packages_base_url" {
-#   value = "https://${data.azurerm_storage_account.devops.name}.blob.core.windows.net/${azurerm_storage_container.packages.name}"
-# }
+
+output "ARTIFACT_STORAGE" {
+  value = azurerm_storage_container.artifacts.storage_account_name
+}
+
+output "ARTIFACT_CONTAINER" {
+  value = azurerm_storage_container.artifacts.name
+}

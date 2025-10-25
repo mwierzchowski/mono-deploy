@@ -71,3 +71,6 @@ In case of changed Terraform backend following entries have to be updated:
 terraform -chdir=./bootstrap/random_suffix init
 terraform -chdir=./bootstrap/random_suffix apply -auto-approve
 ```
+
+
+TODO UPDATE MONO_DEPLOY_PUSH_TOKEN

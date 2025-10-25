@@ -1,6 +1,8 @@
 terraform {
-  backend "local" {}
   required_version = ">= 1.8"
+  backend "azurerm" {
+    key = "devops.tfstate"
+  }
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"

@@ -16,29 +16,25 @@ should not be granted by GitHub actions itself to minimize potential security in
 
 ### Create tfstate
 ```bash
-terraform -chdir=./bootstrap/tfstate init
-terraform -chdir=./bootstrap/tfstate \
+terraform -chdir=./base/tfstate init
+terraform -chdir=./base/tfstate \
            apply -auto-approve \
           -var-file=../../terraform.tfvars
 ```
 
-### Add privilidges to GitHub Actions
+### Create devops
 
 ```bash
-terraform -chdir=./bootstrap/github_actions \
+terraform -chdir=./base/devops \
            init \
           -backend-config=../../terraform.tfbackend
-terraform -chdir=./bootstrap/github_actions \
+terraform -chdir=./base/devops\
            apply -auto-approve \
           -var-file=../../terraform.tfvars
 ```
 Update secrets (AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID and AZURE_CLIENT_ID) in:
 1. [mono-deploy](https://github.com/mwierzchowski/mono-deploy/settings/secrets/actions)
 2. [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions)
-
-### Deploy DevOps services
-Run [devops](https://github.com/mwierzchowski/mono-deploy/actions/workflows/devops.yaml) workflow.
-
 
 ## Troubleshooting
 

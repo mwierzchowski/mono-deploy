@@ -5,7 +5,7 @@ locals {
 }
 
 resource "azurerm_container_registry" "acr" {
-  name                = "acr${local.family}${local.group}${random_id.suffix.hex}"
+  name                = var.devops.registry
   resource_group_name = azurerm_resource_group.devops.name
   location            = azurerm_resource_group.devops.location
   sku                 = "Basic"
@@ -17,7 +17,7 @@ resource "azurerm_container_registry_task" "acr_purge" {
   name                  = "task-acr-purge"
   container_registry_id = azurerm_container_registry.acr.id
   is_system_task        = false
-  tags                  = local.tags
+  tags                  = azurerm_resource_group.devops.tags
 
   platform {
     os = "Linux"
@@ -39,6 +39,6 @@ resource "azurerm_container_registry_task" "acr_purge" {
   }
 }
 
-output "acr_login_server" {
+output "IMAGE_REGISTRY" {
   value = azurerm_container_registry.acr.login_server
 }

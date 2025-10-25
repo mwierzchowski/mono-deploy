@@ -14,29 +14,30 @@ should not be granted by GitHub actions itself to minimize potential security in
 > (#troubleshooting)
 > for more details.
 
-### Create tfstate
+### Create tfstate backend
 ```bash
 terraform -chdir=./base/tfstate init
-terraform -chdir=./base/tfstate \
-           apply -auto-approve \
-          -var-file=../../terraform.tfvars
+terraform -chdir=./base/tfstate apply -auto-approve -var-file=../../terraform.tfvars
 ```
 
-### Create devops
+### Deploy devops stack
 
 ```bash
-terraform -chdir=./base/devops \
-           init \
-          -backend-config=../../terraform.tfbackend
-terraform -chdir=./base/devops\
-           apply -auto-approve \
-          -var-file=../../terraform.tfvars
+terraform -chdir=./base/devops init -backend-config=../../terraform.tfbackend
+terraform -chdir=./base/devops apply -auto-approve -var-file=../../terraform.tfvars
 ```
-Update secrets (AZURE_SUBSCRIPTION_ID, AZURE_TENANT_ID and AZURE_CLIENT_ID) in:
+Update GH secrets (`AZURE_SUBSCRIPTION_ID`, `AZURE_TENANT_ID` and `AZURE_CLIENT_ID`) in:
 1. [mono-deploy](https://github.com/mwierzchowski/mono-deploy/settings/secrets/actions)
 2. [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions)
+3. ... and other code repos.
 
 ## Troubleshooting
+
+### Mono-deploy PAT has expired
+1. Regenerate [`mono-deploy-write`](https://github.com/settings/personal-access-tokens/9082055) PAT.
+2. Update [`MONO_DEPLOY_PUSH_TOKEN`](https://github.com/mwierzchowski/mono-jvm/settings/secrets/actions/MONO_DEPLOY_PUSH_TOKEN)
+   secret in mono-jvm.
+3. ... and in other code repos.
 
 ### Azure login
 ```bash
@@ -45,28 +46,38 @@ export ARM_SUBSCRIPTION_ID=$(az account show --query id -o tsv)
 export ARM_TENANT_ID=$(az account show --query tenantId -o tsv)
 ```
 
-### Delete protected RGs
+### Delete protected resources
+DevOps:
+```bash
+az lock delete --name devops-st-lock --resource-group rg-mono-devops
+az lock delete --name devops-acr-lock --resource-group rg-mono-devops
+az group delete --name rg-mono-devops --yes
+```
+Tfstate:
 ```bash
 az lock delete --name tfstate-lock --resource-group rg-mono-tfstate
 az group delete --name rg-mono-tfstate --yes
-az lock delete --name devops-lock --resource-group rg-mono-devops
-az group delete --name rg-mono-devops --yes
 ```
 
-### Delete Entra apps
-Visit Microsoft Entra ID
-[App registrations](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps).
-
 ### Terraform backend has changed
-In case of changed Terraform backend following entries have to be updated:
-1. `terraform.tfbackend`
-2. `terraform.tfvars`
+Update:
+1. `terraform.tfbackend` / `storage_account_name`
+2. `terraform.tfvars` / `tfstate.storage`
 
-### New random suffix
+### DevOps storage and/or ACR have changed
+Update:
+1. File `terraform.tfvars` / `devops.storage`
+2. File `terraform.tfvars` / `devops.registry`
+3. GH Variables (`ARTIFACT_CONTAINER`, `ARTIFACT_STORAGE`, `IMAGE_REGISTRY`) in
+   [mono-jvm](https://github.com/mwierzchowski/mono-jvm/settings/variables/actions)
+4. ... and in other code repos.
+
+### Delete Entra apps
+Delete app [registrations](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps)
+in  Azure Portal.
+
+### Generate new random suffix
 ```bash
 terraform -chdir=./bootstrap/random_suffix init
 terraform -chdir=./bootstrap/random_suffix apply -auto-approve
 ```
-
-
-TODO UPDATE MONO_DEPLOY_PUSH_TOKEN

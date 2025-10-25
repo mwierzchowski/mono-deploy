@@ -19,17 +19,19 @@ should not be granted by GitHub actions itself to minimize potential security in
 ```bash
 terraform -chdir=./bootstrap/tfstate init
 terraform -chdir=./bootstrap/tfstate apply -auto-approve \
-            -var-file=../../terraform.tfvars
+          -var-file=../../terraform.tfvars
 ```
 
-Update backend if suffix changed.
+### GitHub Actions
 
 ```bash
-cd bootstrap/devops-iam
-terraform init -backend-config=../../terraform.tfbackend
-terraform apply -auto-approve -var-file=../../terraform.tfvars
+terraform -chdir=./bootstrap/github_actions init \
+          -backend-config=../../terraform.tfbackend
+terraform -chdir=./bootstrap/github_actions apply -auto-approve \
+          -var-file=../../terraform.tfvars
 ```
 
+TODO - trouble shooting
 Update github secrets in all repositories.
 
 ### Configuration
@@ -61,3 +63,10 @@ az group delete --name rg-mono-devops --yes
 
 Visit Microsoft Entra ID
 [App registrations](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/RegisteredApps).
+
+### Terraform backend has changed
+
+In case of changed Terraform backend following entries have to be updated:
+1. `terraform.tfbackend`
+2. `terraform.tfvars`
+

@@ -1,6 +1,8 @@
 terraform {
-  backend "local" {}
   required_version = ">= 1.8"
+  backend "azurerm" {
+    key = "github_actions.tfstate"
+  }
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -9,10 +11,6 @@ terraform {
     azuread = {
       source = "hashicorp/azuread",
       version = "~> 2.50"
-    }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.6"
     }
   }
 }

@@ -10,9 +10,8 @@ should not be granted by GitHub actions itself to minimize potential security in
 ## Setup
 
 > [!TIP]
-> User have to be in the root directory of the repository and logged in to Azure CLI. See [Troubleshooting]
-> (#troubleshooting)
-> for more details.
+> User have to be in the root directory of the repository and logged in to Azure CLI. See
+> [Troubleshooting](#troubleshooting) for more details.
 
 ### Create tfstate backend
 ```bash

@@ -18,8 +18,6 @@ resource "azurerm_service_plan" "preview" {
 }
 
 resource "azurerm_user_assigned_identity" "uami_azf" {
-  # for_each            = local.azf_cfg.apps
-  # name                = "uami-${var.family}-${local.stack}-${each.key}"
   name                = "uami-${var.family}-${local.stack}-azf"
   resource_group_name = azurerm_resource_group.preview.name
   location            = azurerm_resource_group.preview.location
@@ -27,10 +25,8 @@ resource "azurerm_user_assigned_identity" "uami_azf" {
 }
 
 resource "azurerm_role_assignment" "uami_azf_artifacts_reader" {
-  # for_each             = local.azf_cfg.apps
   scope                = data.azurerm_storage_account.devops.id
   role_definition_name = "Storage Blob Data Reader"
-  # principal_id         = azurerm_user_assigned_identity.uami_azf[each.key].principal_id
   principal_id         = azurerm_user_assigned_identity.uami_azf.principal_id
 }
 
@@ -49,7 +45,6 @@ resource "azurerm_linux_function_app" "azf_app" {
 
   identity {
     type         = "UserAssigned"
-    # identity_ids = [azurerm_user_assigned_identity.uami_azf[each.key].id]
     identity_ids = [azurerm_user_assigned_identity.uami_azf.id]
   }
 
@@ -58,7 +53,6 @@ resource "azurerm_linux_function_app" "azf_app" {
       FUNCTIONS_EXTENSION_VERSION                  = var.azf_defaults.functions_extension_version
       FUNCTIONS_WORKER_RUNTIME                     = var.azf_defaults.worker_runtime
       WEBSITE_RUN_FROM_PACKAGE                     = each.value.package_url
-      # WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID = azurerm_user_assigned_identity.uami_azf[each.key].id
       WEBSITE_RUN_FROM_PACKAGE_BLOB_MI_RESOURCE_ID = azurerm_user_assigned_identity.uami_azf.id
     },
     lookup(each.value, "app_settings", {})
